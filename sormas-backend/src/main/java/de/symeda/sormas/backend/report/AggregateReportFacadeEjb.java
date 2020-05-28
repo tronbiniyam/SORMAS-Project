@@ -98,49 +98,58 @@ public class AggregateReportFacadeEjb implements AggregateReportFacade {
 
 		return service.getAllUuids();
 	}
-	
+
 	@Override
 	public List<AggregatedCaseCountDto> getIndexList(AggregateReportCriteria criteria) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
 		Root<AggregateReport> root = cq.from(AggregateReport.class);
-		
+
 		Predicate filter = service.createUserFilter(cb, cq, root);
 		if (criteria != null) {
 			Predicate criteriaFilter = service.createCriteriaFilter(criteria, cb, cq, root);
 			filter = AbstractAdoService.and(cb, filter, criteriaFilter);
 		}
-		
+
 		if (filter != null) {
 			cq.where(filter);
 		}
-		
-		cq.multiselect(root.get(AggregateReport.DISEASE), cb.sum(root.get(AggregateReport.NEW_CASES)),
-				cb.sum(root.get(AggregateReport.LAB_CONFIRMATIONS)), cb.sum(root.get(AggregateReport.DEATHS)));
+
+		cq.multiselect(
+			root.get(AggregateReport.DISEASE),
+			cb.sum(root.get(AggregateReport.NEW_CASES)),
+			cb.sum(root.get(AggregateReport.LAB_CONFIRMATIONS)),
+			cb.sum(root.get(AggregateReport.DEATHS)));
 		cq.groupBy(root.get(AggregateReport.DISEASE));
-		
+
 		List<Object[]> resultList = em.createQuery(cq).getResultList();
 		Map<Disease, AggregatedCaseCountDto> reportSet = new HashMap<>();
-		
+
 		for (Object[] result : resultList) {
-			reportSet.put((Disease) result[0], new AggregatedCaseCountDto((Disease) result[0], ((Long) result[1]).intValue(), ((Long) result[2]).intValue(), ((Long) result[3]).intValue()));
+			reportSet.put(
+				(Disease) result[0],
+				new AggregatedCaseCountDto(
+					(Disease) result[0],
+					((Long) result[1]).intValue(),
+					((Long) result[2]).intValue(),
+					((Long) result[3]).intValue()));
 		}
-		
+
 		for (Disease disease : diseaseConfigurationFacade.getAllDiseases(true, false, false)) {
 			if (!reportSet.containsKey(disease)) {
 				reportSet.put(disease, new AggregatedCaseCountDto(disease, 0, 0, 0));
 			}
 		}
-		
+
 		List<AggregatedCaseCountDto> reportList = new ArrayList<>(reportSet.values());
 		reportList.sort(Comparator.comparing(r -> r.getDisease().toString()));
 		return reportList;
 	}
-	
+
 	@Override
 	public List<AggregateReportDto> getList(AggregateReportCriteria criteria) {
 		User user = userService.getCurrentUser();
-		
+
 		return service.findBy(criteria, user).stream().map(c -> toDto(c)).collect(Collectors.toList());
 	}
 
@@ -151,7 +160,7 @@ public class AggregateReportFacadeEjb implements AggregateReportFacade {
 			target.setUuid(source.getUuid());
 		}
 		DtoHelper.validateDto(source, target);
-		
+
 		target.setDisease(source.getDisease());
 		target.setReportingUser(userService.getByReferenceDto(source.getReportingUser()));
 		target.setYear(source.getYear());
@@ -163,17 +172,17 @@ public class AggregateReportFacadeEjb implements AggregateReportFacade {
 		target.setNewCases(source.getNewCases());
 		target.setLabConfirmations(source.getLabConfirmations());
 		target.setDeaths(source.getDeaths());
-		
+
 		return target;
 	}
-	
+
 	public static AggregateReportDto toDto(AggregateReport source) {
 		if (source == null) {
 			return null;
 		}
 		AggregateReportDto target = new AggregateReportDto();
 		DtoHelper.fillDto(target, source);
-		
+
 		target.setDisease(source.getDisease());
 		target.setReportingUser(UserFacadeEjb.toReferenceDto(source.getReportingUser()));
 		target.setYear(source.getYear());
@@ -188,13 +197,12 @@ public class AggregateReportFacadeEjb implements AggregateReportFacade {
 
 		return target;
 	}
-	
+
 	@Override
 	public void deleteReport(String reportUuid) {
 		User user = userService.getCurrentUser();
-		if (!userRoleConfigFacade
-				.getEffectiveUserRights(user.getUserRoles().toArray(new UserRole[user.getUserRoles().size()]))
-				.contains(UserRight.AGGREGATE_REPORT_EDIT)) {
+		if (!userRoleConfigFacade.getEffectiveUserRights(user.getUserRoles().toArray(new UserRole[user.getUserRoles().size()]))
+			.contains(UserRight.AGGREGATE_REPORT_EDIT)) {
 			throw new UnsupportedOperationException("User " + user.getUuid() + " is not allowed to edit aggregate reports.");
 		}
 

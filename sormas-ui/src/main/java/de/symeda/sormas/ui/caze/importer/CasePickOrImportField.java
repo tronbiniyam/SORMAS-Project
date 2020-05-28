@@ -54,7 +54,8 @@ public class CasePickOrImportField extends CasePickOrCreateField {
 		// Imported case info
 		VerticalLayout caseInfoContainer = new VerticalLayout();
 		caseInfoContainer.setWidth(100, Unit.PERCENTAGE);
-		CssStyles.style(caseInfoContainer, CssStyles.BACKGROUND_ROUNDED_CORNERS, CssStyles.BACKGROUND_SUB_CRITERIA, CssStyles.VSPACE_3, "v-scrollable");
+		CssStyles
+			.style(caseInfoContainer, CssStyles.BACKGROUND_ROUNDED_CORNERS, CssStyles.BACKGROUND_SUB_CRITERIA, CssStyles.VSPACE_3, "v-scrollable");
 
 		Label importedCaseLabel = new Label(I18nProperties.getString(Strings.headingImportedCaseInfo));
 		CssStyles.style(importedCaseLabel, CssStyles.LABEL_BOLD, CssStyles.VSPACE_4);
@@ -90,7 +91,9 @@ public class CasePickOrImportField extends CasePickOrCreateField {
 
 			Label facilityField = new Label();
 			facilityField.setCaption(I18nProperties.getPrefixCaption(CaseDataDto.I18N_PREFIX, CaseDataDto.HEALTH_FACILITY));
-			facilityField.setValue(FacilityHelper.buildFacilityString(null,
+			facilityField.setValue(
+				FacilityHelper.buildFacilityString(
+					null,
 					importedCase.getHealthFacility() != null ? importedCase.getHealthFacility().toString() : "",
 					importedCase.getHealthFacilityDetails()));
 			facilityField.setWidthUndefined();
@@ -110,8 +113,14 @@ public class CasePickOrImportField extends CasePickOrCreateField {
 
 			Label ageAndBirthDateField = new Label();
 			ageAndBirthDateField.setCaption(I18nProperties.getCaption(Captions.personAgeAndBirthdate));
-			ageAndBirthDateField.setValue(PersonHelper.getAgeAndBirthdateString(importedPerson.getApproximateAge(), importedPerson.getApproximateAgeType(),
-					importedPerson.getBirthdateDD(), importedPerson.getBirthdateMM(), importedPerson.getBirthdateYYYY(), I18nProperties.getUserLanguage()));
+			ageAndBirthDateField.setValue(
+				PersonHelper.getAgeAndBirthdateString(
+					importedPerson.getApproximateAge(),
+					importedPerson.getApproximateAgeType(),
+					importedPerson.getBirthdateDD(),
+					importedPerson.getBirthdateMM(),
+					importedPerson.getBirthdateYYYY(),
+					I18nProperties.getUserLanguage()));
 			ageAndBirthDateField.setWidthUndefined();
 			caseInfoLayout.addComponent(ageAndBirthDateField);
 

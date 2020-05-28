@@ -44,10 +44,10 @@ public class TreatmentFacadeEjbTest extends AbstractBeanTest {
 		PersonDto casePerson = creator.createPerson("Case", "Person");
 		CaseDataDto caze = creator.createCase(user.toReference(), casePerson.toReference(), rdcf);
 		creator.createTreatment(caze);
-		
+
 		List<TreatmentIndexDto> results = getTreatmentFacade().getIndexList(null);
-		
+
 		assertEquals(1, results.size());
-	}	
-	
+	}
+
 }

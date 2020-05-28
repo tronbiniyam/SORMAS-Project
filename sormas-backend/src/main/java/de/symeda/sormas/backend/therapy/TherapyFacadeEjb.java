@@ -21,7 +21,7 @@ public class TherapyFacadeEjb implements TherapyFacade {
 
 	@PersistenceContext(unitName = ModelConstants.PERSISTENCE_UNIT_NAME)
 	private EntityManager em;
-	
+
 	@EJB
 	private TherapyService service;
 	@EJB
@@ -31,7 +31,7 @@ public class TherapyFacadeEjb implements TherapyFacade {
 		if (entity == null) {
 			return null;
 		}
-		
+
 		TherapyReferenceDto dto = new TherapyReferenceDto(entity.getUuid(), entity.toString());
 		return dto;
 	}
@@ -48,7 +48,7 @@ public class TherapyFacadeEjb implements TherapyFacade {
 
 	public Therapy fromDto(@NotNull TherapyDto source) {
 		Therapy target = service.getByUuid(source.getUuid());
-		
+
 		if (target == null) {
 			target = new Therapy();
 			target.setUuid(source.getUuid());
@@ -61,7 +61,7 @@ public class TherapyFacadeEjb implements TherapyFacade {
 
 		return target;
 	}
-	
+
 	@LocalBean
 	@Stateless
 	public static class TherapyFacadeEjbLocal extends TherapyFacadeEjb {

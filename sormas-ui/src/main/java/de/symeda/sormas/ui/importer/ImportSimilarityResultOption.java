@@ -7,5 +7,5 @@ public enum ImportSimilarityResultOption {
 	CREATE,
 	SKIP,
 	CANCEL;
-	
+
 }

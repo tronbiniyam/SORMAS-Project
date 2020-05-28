@@ -21,8 +21,7 @@ public class UserRoleConfigFacadeEjbTest extends AbstractBeanTest {
 	public void testGetEffectiveUserRights() throws Exception {
 
 		// 1. no role configured -> use defaults
-		Set<UserRight> supervisorRights = getUserRoleConfigFacade()
-				.getEffectiveUserRights(UserRole.SURVEILLANCE_SUPERVISOR);
+		Set<UserRight> supervisorRights = getUserRoleConfigFacade().getEffectiveUserRights(UserRole.SURVEILLANCE_SUPERVISOR);
 		assertThat(supervisorRights, is(UserRole.SURVEILLANCE_SUPERVISOR.getDefaultUserRights()));
 
 		UserRoleConfigDto userRoleConfig = UserRoleConfigDto.build(UserRole.SURVEILLANCE_SUPERVISOR);
@@ -38,14 +37,12 @@ public class UserRoleConfigFacadeEjbTest extends AbstractBeanTest {
 		userRoleConfig = getUserRoleConfigFacade().saveUserRoleConfig(userRoleConfig);
 
 		supervisorRights = getUserRoleConfigFacade().getEffectiveUserRights(UserRole.SURVEILLANCE_SUPERVISOR);
-		assertThat(supervisorRights,
-				is(new HashSet<UserRight>(Arrays.asList(UserRight.CASE_CREATE, UserRight.CASE_EDIT))));
+		assertThat(supervisorRights, is(new HashSet<UserRight>(Arrays.asList(UserRight.CASE_CREATE, UserRight.CASE_EDIT))));
 
 		// 4. combine configured and default rights
-		Set<UserRight> mixedUserRights = getUserRoleConfigFacade()
-				.getEffectiveUserRights(UserRole.SURVEILLANCE_SUPERVISOR, UserRole.NATIONAL_OBSERVER);
-		Set<UserRight> expectedUserRights = new HashSet<UserRight>(
-				Arrays.asList(UserRight.CASE_CREATE, UserRight.CASE_EDIT));
+		Set<UserRight> mixedUserRights =
+			getUserRoleConfigFacade().getEffectiveUserRights(UserRole.SURVEILLANCE_SUPERVISOR, UserRole.NATIONAL_OBSERVER);
+		Set<UserRight> expectedUserRights = new HashSet<UserRight>(Arrays.asList(UserRight.CASE_CREATE, UserRight.CASE_EDIT));
 		expectedUserRights.addAll(UserRole.NATIONAL_OBSERVER.getDefaultUserRights());
 		assertThat(mixedUserRights, is(expectedUserRights));
 

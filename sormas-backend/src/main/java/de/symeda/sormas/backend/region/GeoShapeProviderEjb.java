@@ -9,11 +9,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *******************************************************************************/
 package de.symeda.sormas.backend.region;
 
@@ -68,29 +68,30 @@ public class GeoShapeProviderEjb implements GeoShapeProvider {
 
 	private Map<RegionReferenceDto, MultiPolygon> regionMultiPolygons = new HashMap<>();
 	private Map<RegionReferenceDto, GeoLatLon[][]> regionShapes = new HashMap<>();
-	
+
 	private GeoLatLon regionsCenter;
 
 	private Map<DistrictReferenceDto, MultiPolygon> districtMultiPolygons = new HashMap<>();
 	private Map<DistrictReferenceDto, GeoLatLon[][]> districtShapes = new HashMap<>();
-	
+
 	private GeoLatLon[][] countryShape;
 
 	@Override
 	public GeoLatLon[][] getRegionShape(RegionReferenceDto region) {
 		return regionShapes.get(region);
 	}
-	
+
 	@Override
 	public GeoLatLon[][] getCountryShape() {
 		return countryShape;
 	}
-	
+
 	@Override
 	public RegionReferenceDto getRegionByCoord(GeoLatLon latLon) {
 		for (Entry<RegionReferenceDto, MultiPolygon> regionMultiPolygon : regionMultiPolygons.entrySet()) {
-			if (regionMultiPolygon.getValue().contains(GeometryFactory.createPointFromInternalCoord(
-					new Coordinate(latLon.getLon(), latLon.getLat()), regionMultiPolygon.getValue()))) {
+			if (regionMultiPolygon.getValue()
+				.contains(
+					GeometryFactory.createPointFromInternalCoord(new Coordinate(latLon.getLon(), latLon.getLat()), regionMultiPolygon.getValue()))) {
 				return regionMultiPolygon.getKey();
 			}
 		}
@@ -105,9 +106,9 @@ public class GeoShapeProviderEjb implements GeoShapeProvider {
 	protected void updateCenterOfAllRegions() {
 		if (regionMultiPolygons.isEmpty()) {
 			regionsCenter = null;
-			
+
 		} else {
-			
+
 			double lat = 0, lon = 0;
 			int count = 0;
 			for (MultiPolygon polygon : regionMultiPolygons.values()) {
@@ -115,7 +116,7 @@ public class GeoShapeProviderEjb implements GeoShapeProvider {
 				lon += polygon.getCentroid().getY();
 				count++;
 			}
-			
+
 			if (count > 0) {
 				regionsCenter = new GeoLatLon(lat / count, lon / count);
 			} else {
@@ -126,16 +127,14 @@ public class GeoShapeProviderEjb implements GeoShapeProvider {
 
 	@Override
 	public GeoLatLon getCenterOfRegion(RegionReferenceDto region) {
-		
-		if (regionMultiPolygons.isEmpty()
-				|| !regionMultiPolygons.containsKey(region)) {
+
+		if (regionMultiPolygons.isEmpty() || !regionMultiPolygons.containsKey(region)) {
 			return getCenterOfAllRegions();
 		}
-		
+
 		Point polygonCenter = regionMultiPolygons.get(region).getCentroid();
 		return new GeoLatLon(polygonCenter.getX(), polygonCenter.getY());
 	}
-	
 
 	@Override
 	public GeoLatLon[][] getDistrictShape(DistrictReferenceDto district) {
@@ -145,22 +144,23 @@ public class GeoShapeProviderEjb implements GeoShapeProvider {
 	@Override
 	public DistrictReferenceDto getDistrictByCoord(GeoLatLon latLon) {
 		for (Entry<DistrictReferenceDto, MultiPolygon> districtMultiPolygon : districtMultiPolygons.entrySet()) {
-			if (districtMultiPolygon.getValue().contains(GeometryFactory.createPointFromInternalCoord(
-					new Coordinate(latLon.getLon(), latLon.getLat()), districtMultiPolygon.getValue()))) {
+			if (districtMultiPolygon.getValue()
+				.contains(
+					GeometryFactory
+						.createPointFromInternalCoord(new Coordinate(latLon.getLon(), latLon.getLat()), districtMultiPolygon.getValue()))) {
 				return districtMultiPolygon.getKey();
 			}
 		}
 		return null;
 	}
-	
+
 	@Override
 	public GeoLatLon getCenterOfDistrict(DistrictReferenceDto district) {
-		
-		if (districtMultiPolygons.isEmpty()
-				|| !districtMultiPolygons.containsKey(district)) {
+
+		if (districtMultiPolygons.isEmpty() || !districtMultiPolygons.containsKey(district)) {
 			return getCenterOfAllRegions();
 		}
-		
+
 		Point polygonCenter = districtMultiPolygons.get(district).getCentroid();
 		return new GeoLatLon(polygonCenter.getX(), polygonCenter.getY());
 	}
@@ -175,7 +175,7 @@ public class GeoShapeProviderEjb implements GeoShapeProvider {
 			loadRegionData(countryName);
 			loadDistrictData(countryName);
 		}
-			buildCountryShape();
+		buildCountryShape();
 	}
 
 	private void loadRegionData(String countryName) {
@@ -213,15 +213,17 @@ public class GeoShapeProviderEjb implements GeoShapeProvider {
 				Optional<RegionReferenceDto> regionResult = regions.stream().filter(r -> {
 					String regionName = r.getCaption().replaceAll("\\W", "").toLowerCase();
 					return regionName.contains(finalShapeRegionName) || finalShapeRegionName.contains(regionName);
-				}).reduce((r1, r2) -> {
-					// dumb heuristic: take the result that best fits the length
-					if (Math.abs(r1.getCaption().length() - finalShapeRegionName.length()) <= Math
-							.abs(r2.getCaption().length() - finalShapeRegionName.length())) {
-						return r1;
-					} else {
-						return r2;
-					}
-				});
+				})
+					.reduce(
+						(r1, r2) -> {
+							// dumb heuristic: take the result that best fits the length
+							if (Math.abs(r1.getCaption().length() - finalShapeRegionName.length())
+								<= Math.abs(r2.getCaption().length() - finalShapeRegionName.length())) {
+								return r1;
+							} else {
+								return r2;
+							}
+						});
 
 				if (!regionResult.isPresent()) {
 					logger.warn("Region not found: " + shapeRegionName);
@@ -235,7 +237,8 @@ public class GeoShapeProviderEjb implements GeoShapeProvider {
 				for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
 					Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
 					regionShape[i] = Arrays.stream(polygon.getExteriorRing().getCoordinates())
-							.map(c -> new GeoLatLon(c.y, c.x)).toArray(size -> new GeoLatLon[size]);
+						.map(c -> new GeoLatLon(c.y, c.x))
+						.toArray(size -> new GeoLatLon[size]);
 				}
 				regionShapes.put(region, regionShape);
 			}
@@ -257,7 +260,7 @@ public class GeoShapeProviderEjb implements GeoShapeProvider {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		updateCenterOfAllRegions();
 	}
 
@@ -299,18 +302,18 @@ public class GeoShapeProviderEjb implements GeoShapeProvider {
 				Optional<DistrictReferenceDto> districtResult = districts.stream().filter(r -> {
 					String districtName = r.getCaption().replaceAll("\\W", "").toLowerCase();
 					return districtName.contains(finalShapeDistrictName)
-							|| finalShapeDistrictName.contains(districtName)
-							|| similarity(finalShapeDistrictName, districtName) > 0.7f;
+						|| finalShapeDistrictName.contains(districtName)
+						|| similarity(finalShapeDistrictName, districtName) > 0.7f;
 				}).reduce((r1, r2) -> {
 					// take the result that best fits
-					
+
 					if (r1.getCaption().replaceAll("\\W", "").toLowerCase().equals(finalShapeDistrictName))
 						return r1;
 					if (r2.getCaption().replaceAll("\\W", "").toLowerCase().equals(finalShapeDistrictName))
 						return r2;
-					
-					return Double.compare(similarity(r1.getCaption(), finalShapeDistrictName),
-							similarity(r2.getCaption(), finalShapeDistrictName)) <= 0 ? r1 : r2;
+
+					return Double.compare(similarity(r1.getCaption(), finalShapeDistrictName), similarity(r2.getCaption(), finalShapeDistrictName))
+						<= 0 ? r1 : r2;
 				});
 
 				if (!districtResult.isPresent()) {
@@ -325,7 +328,8 @@ public class GeoShapeProviderEjb implements GeoShapeProvider {
 				for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
 					Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
 					districtShape[i] = Arrays.stream(polygon.getExteriorRing().getCoordinates())
-							.map(c -> new GeoLatLon(c.y, c.x)).toArray(size -> new GeoLatLon[size]);
+						.map(c -> new GeoLatLon(c.y, c.x))
+						.toArray(size -> new GeoLatLon[size]);
 				}
 				districtShapes.put(district, districtShape);
 			}
@@ -350,42 +354,43 @@ public class GeoShapeProviderEjb implements GeoShapeProvider {
 	}
 
 	private void buildCountryShape() {
-		
+
 		GeometryFactory factory = JTSFactoryFinder.getGeometryFactory();
 
 		// combine all regions that touch into new polygons
 		List<Polygon> polygons = new ArrayList<Polygon>();
 		for (GeoLatLon[][] regionShape : regionShapes.values()) {
-			
+
 			for (GeoLatLon[] regionPolygon : regionShape) {
-				
+
 				// convert region to polygon
-				Polygon polygon = factory.createPolygon(Arrays.stream(regionPolygon)
+				Polygon polygon = factory.createPolygon(
+					Arrays.stream(regionPolygon)
 						.map(regionPoint -> new Coordinate(regionPoint.getLon(), regionPoint.getLat()))
 						.toArray(Coordinate[]::new));
-				
+
 				boolean added = false;
-				for (int i=0; i<polygons.size(); i++) {
+				for (int i = 0; i < polygons.size(); i++) {
 					if (polygons.get(i).touches(polygon)) { // touch?
-						polygons.set(i, (Polygon)polygons.get(i).union(polygon)); // union
+						polygons.set(i, (Polygon) polygons.get(i).union(polygon)); // union
 						added = true;
 						break;
 					}
 				}
-			
+
 				if (!added) {
 					polygons.add(polygon);
 				}
 			}
 		}
-	
+
 		// go through the polygons again
-		for (int i=0; i<polygons.size(); i++) {
-			for (int j=0; j<polygons.size(); j++) {
-				if (i==j)
+		for (int i = 0; i < polygons.size(); i++) {
+			for (int j = 0; j < polygons.size(); j++) {
+				if (i == j)
 					continue;
 				if (polygons.get(i).touches(polygons.get(j))) { // touch
-					polygons.set(i, (Polygon)polygons.get(i).union(polygons.get(j))); // union
+					polygons.set(i, (Polygon) polygons.get(i).union(polygons.get(j))); // union
 					polygons.remove(j);
 					if (i >= j) {
 						i--;
@@ -396,12 +401,13 @@ public class GeoShapeProviderEjb implements GeoShapeProvider {
 				}
 			}
 		}
-		
+
 		countryShape = polygons.stream()
-				.map(polygon -> Arrays.stream(polygon.getCoordinates())
-						.map(coordinate -> new GeoLatLon(coordinate.y, coordinate.x))
-						.toArray(GeoLatLon[]::new))
-				.toArray(GeoLatLon[][]::new);
+			.map(
+				polygon -> Arrays.stream(polygon.getCoordinates())
+					.map(coordinate -> new GeoLatLon(coordinate.y, coordinate.x))
+					.toArray(GeoLatLon[]::new))
+			.toArray(GeoLatLon[][]::new);
 	}
 
 	/**
@@ -410,7 +416,7 @@ public class GeoShapeProviderEjb implements GeoShapeProvider {
 	public static double similarity(String s1, String s2) {
 		String longer = s1, shorter = s2;
 		if (s1.length() < s2.length()) { // longer should always have greater
-											// length
+										// length
 			longer = s2;
 			shorter = s1;
 		}
@@ -455,7 +461,7 @@ public class GeoShapeProviderEjb implements GeoShapeProvider {
 		}
 		return costs[s2.length()];
 	}
-	
+
 	@LocalBean
 	@Stateless
 	public static class GeoShapeProviderEjbLocal extends GeoShapeProviderEjb {

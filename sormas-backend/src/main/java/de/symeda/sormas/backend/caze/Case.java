@@ -9,11 +9,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *******************************************************************************/
 package de.symeda.sormas.backend.caze;
 
@@ -128,7 +128,7 @@ public class Case extends CoreAdo {
 	public static final String COMPLETENESS = "completeness";
 	public static final String ADDITIONAL_DETAILS = "additionalDetails";
 	public static final String EXTERNAL_ID = "externalID";
-	public static final String SHARED_TO_COUNTRY = "sharedToCountry";	
+	public static final String SHARED_TO_COUNTRY = "sharedToCountry";
 	public static final String QUARANTINE = "quarantine";
 	public static final String QUARANTINE_FROM = "quarantineFrom";
 	public static final String QUARANTINE_TO = "quarantineTo";
@@ -166,7 +166,7 @@ public class Case extends CoreAdo {
 	private ClinicalCourse clinicalCourse;
 	private MaternalHistory maternalHistory;
 	private PortHealthInfo portHealthInfo;
-	
+
 	private Region region;
 	private District district;
 	private Community community;
@@ -189,7 +189,7 @@ public class Case extends CoreAdo {
 	private String clinicianPhone;
 	private String clinicianEmail;
 	private User caseOfficer;
-	
+
 	private HospitalWardType notifyingClinic;
 	private String notifyingClinicDetails;
 
@@ -213,20 +213,20 @@ public class Case extends CoreAdo {
 	private String sequelaeDetails;
 
 	private Integer caseAge;
-	
+
 	private boolean archived;
 	private String creationVersion;
 	private Case duplicateOf;
-	
+
 	private CaseOrigin caseOrigin;
 	private PointOfEntry pointOfEntry;
 	private String pointOfEntryDetails;
-	
+
 	private Float completeness;
 	private String additionalDetails;
 	private String externalID;
 	private boolean sharedToCountry;
-	
+
 	private QuarantineType quarantine;
 	private Date quarantineFrom;
 	private Date quarantineTo;
@@ -548,7 +548,7 @@ public class Case extends CoreAdo {
 	public Therapy getTherapy() {
 		return therapy;
 	}
-	
+
 	public void setTherapy(Therapy therapy) {
 		this.therapy = therapy;
 	}
@@ -561,11 +561,11 @@ public class Case extends CoreAdo {
 	public ClinicalCourse getClinicalCourse() {
 		return clinicalCourse;
 	}
-	
+
 	public void setClinicalCourse(ClinicalCourse clinicalCourse) {
 		this.clinicalCourse = clinicalCourse;
 	}
-	
+
 	// It's necessary to do a lazy fetch here because having three eager fetching
 	// one to one relations
 	// produces an error where two non-xa connections are opened
@@ -578,7 +578,7 @@ public class Case extends CoreAdo {
 	public void setMaternalHistory(MaternalHistory maternalHistory) {
 		this.maternalHistory = maternalHistory;
 	}
-	
+
 	// It's necessary to do a lazy fetch here because having three eager fetching
 	// one to one relations produces an error where two non-xa connections are opened
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -694,6 +694,7 @@ public class Case extends CoreAdo {
 	public Set<Sample> getSamples() {
 		return samples;
 	}
+
 	public void setSamples(Set<Sample> samples) {
 		this.samples = samples;
 	}
@@ -758,7 +759,7 @@ public class Case extends CoreAdo {
 	public void setSequelae(YesNoUnknown sequelae) {
 		this.sequelae = sequelae;
 	}
-	
+
 	@Column(length = 512)
 	public String getSequelaeDetails() {
 		return sequelaeDetails;
@@ -807,11 +808,11 @@ public class Case extends CoreAdo {
 	public String getCreationVersion() {
 		return creationVersion;
 	}
-	
+
 	public void setCreationVersion(String creationVersion) {
 		this.creationVersion = creationVersion;
 	}
-	
+
 	@OneToOne(cascade = {}, fetch = FetchType.LAZY)
 	@AuditedIgnore
 	public Case getDuplicateOf() {

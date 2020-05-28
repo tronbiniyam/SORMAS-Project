@@ -5,7 +5,7 @@ public abstract class AbstractCoreAdoService<ADO extends CoreAdo> extends Abstra
 	public AbstractCoreAdoService(Class<ADO> elementClass) {
 		super(elementClass);
 	}
-	
+
 	@Override
 	public void delete(ADO deleteme) {
 		deleteme.setDeleted(true);

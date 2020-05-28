@@ -16,18 +16,17 @@ import de.symeda.sormas.ui.utils.PaginationList;
 public class AdditionalTestList extends PaginationList<AdditionalTestDto> {
 
 	private String sampleUuid;
-	
+
 	public AdditionalTestList(String sampleUuid) {
 		super(3);
-		
+
 		this.sampleUuid = sampleUuid;
 	}
-	
+
 	@Override
 	public void reload() {
-		List<AdditionalTestDto> additionalTests = ControllerProvider.getAdditionalTestController()
-				.getAdditionalTestsBySample(sampleUuid);
-		
+		List<AdditionalTestDto> additionalTests = ControllerProvider.getAdditionalTestController().getAdditionalTestsBySample(sampleUuid);
+
 		setEntries(additionalTests);
 		if (!additionalTests.isEmpty()) {
 			showPage(1);
@@ -37,7 +36,7 @@ public class AdditionalTestList extends PaginationList<AdditionalTestDto> {
 			listLayout.addComponent(noAdditionalTestsLabel);
 		}
 	}
-	
+
 	@Override
 	protected void drawDisplayedEntries() {
 		List<AdditionalTestDto> displayedEntries = getDisplayedEntries();
@@ -46,12 +45,11 @@ public class AdditionalTestList extends PaginationList<AdditionalTestDto> {
 			AdditionalTestListEntry listEntry = new AdditionalTestListEntry(additionalTest);
 			if (UserProvider.getCurrent().hasUserRight(UserRight.ADDITIONAL_TEST_EDIT)) {
 				listEntry.addEditListener(i, e -> {
-					ControllerProvider.getAdditionalTestController().openEditComponent(
-							additionalTest, AdditionalTestList.this::reload);
+					ControllerProvider.getAdditionalTestController().openEditComponent(additionalTest, AdditionalTestList.this::reload);
 				});
 			}
 			listLayout.addComponent(listEntry);
 		}
 	}
-	
+
 }

@@ -9,11 +9,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *******************************************************************************/
 package de.symeda.sormas.backend.contact;
 
@@ -80,31 +80,6 @@ import de.symeda.sormas.backend.user.User;
 import de.symeda.sormas.backend.util.DateHelper8;
 import de.symeda.sormas.backend.visit.Visit;
 import de.symeda.sormas.backend.visit.VisitService;
-import org.apache.commons.collections.CollectionUtils;
-
-import javax.ejb.EJB;
-import javax.ejb.LocalBean;
-import javax.ejb.Stateless;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.From;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Stateless
 @LocalBean
@@ -232,10 +207,11 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 		Predicate filter = createActiveContactsFilter(cb, from);
 		filter = cb.and(filter, cb.isNotNull(from.get(Contact.FOLLOW_UP_UNTIL)));
 		filter = cb.and(filter, cb.greaterThanOrEqualTo(from.get(Contact.FOLLOW_UP_UNTIL), fromDate));
-		filter = cb.and(filter,
-				cb.or(cb.and(cb.isNotNull(from.get(Contact.LAST_CONTACT_DATE)),
-						cb.lessThan(from.get(Contact.LAST_CONTACT_DATE), toDate)),
-						cb.lessThan(from.get(Contact.REPORT_DATE_TIME), toDate)));
+		filter = cb.and(
+			filter,
+			cb.or(
+				cb.and(cb.isNotNull(from.get(Contact.LAST_CONTACT_DATE)), cb.lessThan(from.get(Contact.LAST_CONTACT_DATE), toDate)),
+				cb.lessThan(from.get(Contact.REPORT_DATE_TIME), toDate)));
 
 		cq.where(filter);
 
@@ -262,8 +238,8 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 		CriteriaQuery<Contact> cq = cb.createQuery(Contact.class);
 		Root<Contact> contactRoot = cq.from(Contact.class);
 
-		Predicate filter = and(cb, createDefaultFilter(cb, contactRoot),
-				buildRelevantContactsFilter(person, disease, referenceDate, cb, contactRoot));
+		Predicate filter =
+			and(cb, createDefaultFilter(cb, contactRoot), buildRelevantContactsFilter(person, disease, referenceDate, cb, contactRoot));
 		cq.where(filter);
 
 		return new HashSet<>(em.createQuery(cq).getResultList());
@@ -276,34 +252,51 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 	 * until date is after the reference date, including an offset to allow some
 	 * tolerance.
 	 */
-	private Predicate buildRelevantContactsFilter(Person person, Disease disease, Date referenceDate,
-			CriteriaBuilder cb, Root<Contact> from) {
+	private Predicate buildRelevantContactsFilter(Person person, Disease disease, Date referenceDate, CriteriaBuilder cb, Root<Contact> from) {
 		Date referenceDateStart = DateHelper.getStartOfDay(referenceDate);
 		Date referenceDateEnd = DateHelper.getEndOfDay(referenceDate);
 
-		Predicate filter = and(cb, cb.equal(from.get(Contact.PERSON), person),
-				cb.equal(from.get(Contact.DISEASE), disease));
+		Predicate filter = and(cb, cb.equal(from.get(Contact.PERSON), person), cb.equal(from.get(Contact.DISEASE), disease));
 
-		filter = and(cb, filter,
-				or(cb, and(cb, cb.isNull(from.get(Contact.LAST_CONTACT_DATE)),
-						cb.lessThanOrEqualTo(from.get(Contact.REPORT_DATE_TIME),
-								DateHelper.addDays(referenceDateEnd, ContactLogic.ALLOWED_CONTACT_DATE_OFFSET))),
-						cb.lessThanOrEqualTo(from.get(Contact.LAST_CONTACT_DATE),
-								DateHelper.addDays(referenceDateEnd, ContactLogic.ALLOWED_CONTACT_DATE_OFFSET))));
+		filter = and(
+			cb,
+			filter,
+			or(
+				cb,
+				and(
+					cb,
+					cb.isNull(from.get(Contact.LAST_CONTACT_DATE)),
+					cb.lessThanOrEqualTo(
+						from.get(Contact.REPORT_DATE_TIME),
+						DateHelper.addDays(referenceDateEnd, ContactLogic.ALLOWED_CONTACT_DATE_OFFSET))),
+				cb.lessThanOrEqualTo(
+					from.get(Contact.LAST_CONTACT_DATE),
+					DateHelper.addDays(referenceDateEnd, ContactLogic.ALLOWED_CONTACT_DATE_OFFSET))));
 
-		filter = and(cb, filter, or(cb,
+		filter = and(
+			cb,
+			filter,
+			or(
+				cb,
 				// If the contact does not have a follow-up until date, use the last
 				// contact/contact report date as a fallback
-				and(cb, cb.isNull(from.get(Contact.FOLLOW_UP_UNTIL)),
-						or(cb, and(cb, cb.isNull(from.get(Contact.LAST_CONTACT_DATE)),
-								cb.greaterThanOrEqualTo(from.get(Contact.REPORT_DATE_TIME),
-										DateHelper.subtractDays(referenceDateStart,
-												ContactLogic.ALLOWED_CONTACT_DATE_OFFSET))),
-								cb.greaterThanOrEqualTo(from.get(Contact.LAST_CONTACT_DATE),
-										DateHelper.subtractDays(referenceDateStart,
-												ContactLogic.ALLOWED_CONTACT_DATE_OFFSET)))),
-				cb.greaterThanOrEqualTo(from.get(Contact.FOLLOW_UP_UNTIL),
-						DateHelper.subtractDays(referenceDateStart, ContactLogic.ALLOWED_CONTACT_DATE_OFFSET))));
+				and(
+					cb,
+					cb.isNull(from.get(Contact.FOLLOW_UP_UNTIL)),
+					or(
+						cb,
+						and(
+							cb,
+							cb.isNull(from.get(Contact.LAST_CONTACT_DATE)),
+							cb.greaterThanOrEqualTo(
+								from.get(Contact.REPORT_DATE_TIME),
+								DateHelper.subtractDays(referenceDateStart, ContactLogic.ALLOWED_CONTACT_DATE_OFFSET))),
+						cb.greaterThanOrEqualTo(
+							from.get(Contact.LAST_CONTACT_DATE),
+							DateHelper.subtractDays(referenceDateStart, ContactLogic.ALLOWED_CONTACT_DATE_OFFSET)))),
+				cb.greaterThanOrEqualTo(
+					from.get(Contact.FOLLOW_UP_UNTIL),
+					DateHelper.subtractDays(referenceDateStart, ContactLogic.ALLOWED_CONTACT_DATE_OFFSET))));
 
 		return filter;
 	}
@@ -336,8 +329,14 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 		return em.createQuery(cq).getResultList();
 	}
 
-	public List<MapContactDto> getContactsForMap(Region region, District district, Disease disease, Date fromDate,
-			Date toDate, User user, List<String> caseUuids) {
+	public List<MapContactDto> getContactsForMap(
+		Region region,
+		District district,
+		Disease disease,
+		Date fromDate,
+		Date toDate,
+		User user,
+		List<String> caseUuids) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<MapContactDto> cq = cb.createQuery(MapContactDto.class);
 		Root<Contact> contact = cq.from(getElementClass());
@@ -368,8 +367,9 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 		}
 
 		if (region != null) {
-			Predicate regionFilter = cb.or(cb.equal(contact.get(Contact.REGION), region),
-					cb.and(cb.isNull(contact.get(Contact.REGION)), cb.equal(caze.get(Case.REGION), region)));
+			Predicate regionFilter = cb.or(
+				cb.equal(contact.get(Contact.REGION), region),
+				cb.and(cb.isNull(contact.get(Contact.REGION)), cb.equal(caze.get(Case.REGION), region)));
 			if (filter != null) {
 				filter = cb.and(filter, regionFilter);
 			} else {
@@ -378,8 +378,9 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 		}
 
 		if (district != null) {
-			Predicate districtFilter = cb.or(cb.equal(contact.get(Contact.DISTRICT), district),
-					cb.and(cb.isNull(contact.get(Contact.DISTRICT)), cb.equal(caze.get(Case.DISTRICT), district)));
+			Predicate districtFilter = cb.or(
+				cb.equal(contact.get(Contact.DISTRICT), district),
+				cb.and(cb.isNull(contact.get(Contact.DISTRICT)), cb.equal(caze.get(Case.DISTRICT), district)));
 			if (filter != null) {
 				filter = cb.and(filter, districtFilter);
 			} else {
@@ -407,12 +408,20 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 		List<MapContactDto> result;
 		if (filter != null) {
 			cq.where(filter);
-			cq.multiselect(contact.get(Contact.UUID), contact.get(Contact.CONTACT_CLASSIFICATION),
-					contact.get(Contact.REPORT_LAT), contact.get(Contact.REPORT_LON),
-					contactPersonAddress.get(Location.LATITUDE), contactPersonAddress.get(Location.LONGITUDE),
-					symptoms.get(Symptoms.ONSET_DATE), caze.get(Case.REPORT_DATE),
-					contact.get(Contact.REPORT_DATE_TIME), person.get(Person.FIRST_NAME), person.get(Person.LAST_NAME),
-					casePerson.get(Person.FIRST_NAME), casePerson.get(Person.LAST_NAME));
+			cq.multiselect(
+				contact.get(Contact.UUID),
+				contact.get(Contact.CONTACT_CLASSIFICATION),
+				contact.get(Contact.REPORT_LAT),
+				contact.get(Contact.REPORT_LON),
+				contactPersonAddress.get(Location.LATITUDE),
+				contactPersonAddress.get(Location.LONGITUDE),
+				symptoms.get(Symptoms.ONSET_DATE),
+				caze.get(Case.REPORT_DATE),
+				contact.get(Contact.REPORT_DATE_TIME),
+				person.get(Person.FIRST_NAME),
+				person.get(Person.LAST_NAME),
+				casePerson.get(Person.FIRST_NAME),
+				casePerson.get(Person.LAST_NAME));
 
 			result = em.createQuery(cq).getResultList();
 			// #1274 Temporarily disabled because it severely impacts the performance of the
@@ -432,8 +441,7 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 		return result;
 	}
 
-	public List<DashboardContactDto> getContactsForDashboard(Region region, District district, Disease disease,
-			Date from, Date to, User user) {
+	public List<DashboardContactDto> getContactsForDashboard(Region region, District district, Disease disease, Date from, Date to, User user) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<DashboardContactDto> cq = cb.createQuery(DashboardContactDto.class);
 		Root<Contact> contact = cq.from(getElementClass());
@@ -450,8 +458,9 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 		}
 
 		if (region != null) {
-			Predicate regionFilter = cb.or(cb.equal(contact.get(Contact.REGION), region),
-					cb.and(cb.isNull(contact.get(Contact.REGION)), cb.equal(caze.get(Case.REGION), region)));
+			Predicate regionFilter = cb.or(
+				cb.equal(contact.get(Contact.REGION), region),
+				cb.and(cb.isNull(contact.get(Contact.REGION)), cb.equal(caze.get(Case.REGION), region)));
 			if (filter != null) {
 				filter = cb.and(filter, regionFilter);
 			} else {
@@ -460,8 +469,9 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 		}
 
 		if (district != null) {
-			Predicate districtFilter = cb.or(cb.equal(contact.get(Contact.DISTRICT), district),
-					cb.and(cb.isNull(contact.get(Contact.DISTRICT)), cb.equal(caze.get(Case.DISTRICT), district)));
+			Predicate districtFilter = cb.or(
+				cb.equal(contact.get(Contact.DISTRICT), district),
+				cb.and(cb.isNull(contact.get(Contact.DISTRICT)), cb.equal(caze.get(Case.DISTRICT), district)));
 			if (filter != null) {
 				filter = cb.and(filter, districtFilter);
 			} else {
@@ -481,13 +491,13 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 		if (filter != null) {
 			cq.where(filter);
 			cq.multiselect(
-					contact.get(AbstractDomainObject.ID),
-					contact.get(Contact.REPORT_DATE_TIME),
-					contact.get(Contact.CONTACT_STATUS),
-					contact.get(Contact.CONTACT_CLASSIFICATION),
-					contact.get(Contact.FOLLOW_UP_STATUS),
-					contact.get(Contact.FOLLOW_UP_UNTIL),
-					contact.get(Contact.DISEASE));
+				contact.get(AbstractDomainObject.ID),
+				contact.get(Contact.REPORT_DATE_TIME),
+				contact.get(Contact.CONTACT_STATUS),
+				contact.get(Contact.CONTACT_CLASSIFICATION),
+				contact.get(Contact.FOLLOW_UP_STATUS),
+				contact.get(Contact.FOLLOW_UP_UNTIL),
+				contact.get(Contact.DISEASE));
 
 			List<DashboardContactDto> dashboardContacts = em.createQuery(cq).getResultList();
 
@@ -499,30 +509,29 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 				Join<Contact, Visit> visitsJoin = visitsCqRoot.join(Contact.VISITS, JoinType.LEFT);
 				Join<Visit, Symptoms> visitSymptomsJoin = visitsJoin.join(Visit.SYMPTOMS, JoinType.LEFT);
 
-				visitsCq.where(and(cb,
-						contact.get(AbstractDomainObject.ID).in(dashboardContactIds),
-						cb.isNotEmpty(visitsCqRoot.get(Contact.VISITS)))
-						);
+				visitsCq
+					.where(and(cb, contact.get(AbstractDomainObject.ID).in(dashboardContactIds), cb.isNotEmpty(visitsCqRoot.get(Contact.VISITS))));
 				visitsCq.multiselect(
-						visitsCqRoot.get(AbstractDomainObject.ID),
-						visitSymptomsJoin.get(Symptoms.SYMPTOMATIC),
-						visitsJoin.get(Visit.VISIT_STATUS),
-						visitsJoin.get(Visit.VISIT_DATE_TIME));
+					visitsCqRoot.get(AbstractDomainObject.ID),
+					visitSymptomsJoin.get(Symptoms.SYMPTOMATIC),
+					visitsJoin.get(Visit.VISIT_STATUS),
+					visitsJoin.get(Visit.VISIT_DATE_TIME));
 
 				List<DashboardVisit> contactVisits = em.createQuery(visitsCq).getResultList();
 
 				// Add visit information to the DashboardContactDtos
 				for (DashboardContactDto dashboardContact : dashboardContacts) {
-					List<DashboardVisit> visits = contactVisits.stream().filter(v -> v.getContactId() == dashboardContact.getId()).collect(Collectors.toList());
+					List<DashboardVisit> visits =
+						contactVisits.stream().filter(v -> v.getContactId() == dashboardContact.getId()).collect(Collectors.toList());
 
-					DashboardVisit lastVisit = visits.stream()
-							.max((v1, v2) -> v1.getVisitDateTime().compareTo(v2.getVisitDateTime())).orElse(null);
+					DashboardVisit lastVisit = visits.stream().max((v1, v2) -> v1.getVisitDateTime().compareTo(v2.getVisitDateTime())).orElse(null);
 
 					if (lastVisit != null) {
 						dashboardContact.setLastVisitDateTime(lastVisit.getVisitDateTime());
 						dashboardContact.setLastVisitStatus(lastVisit.getVisitStatus());
 						dashboardContact.setSymptomatic(lastVisit.isSymptomatic());
-						dashboardContact.setVisitStatusMap(visits.stream().collect(Collectors.groupingBy(DashboardVisit::getVisitStatus, Collectors.counting())));
+						dashboardContact
+							.setVisitStatusMap(visits.stream().collect(Collectors.groupingBy(DashboardVisit::getVisitStatus, Collectors.counting())));
 					}
 				}
 
@@ -554,13 +563,11 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 		cq.multiselect(contact.get(Contact.CONTACT_STATUS), cb.count(contact));
 		List<Object[]> results = em.createQuery(cq).getResultList();
 
-		Map<ContactStatus, Long> resultMap = results.stream()
-				.collect(Collectors.toMap(e -> (ContactStatus) e[0], e -> (Long) e[1]));
+		Map<ContactStatus, Long> resultMap = results.stream().collect(Collectors.toMap(e -> (ContactStatus) e[0], e -> (Long) e[1]));
 		return resultMap;
 	}
 
-	public Map<ContactClassification, Long> getNewContactCountPerClassification(ContactCriteria contactCriteria,
-			User user) {
+	public Map<ContactClassification, Long> getNewContactCountPerClassification(ContactCriteria contactCriteria, User user) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
 		Root<Contact> contact = cq.from(getElementClass());
@@ -581,8 +588,7 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 		cq.multiselect(contact.get(Contact.CONTACT_CLASSIFICATION), cb.count(contact));
 		List<Object[]> results = em.createQuery(cq).getResultList();
 
-		Map<ContactClassification, Long> resultMap = results.stream()
-				.collect(Collectors.toMap(e -> (ContactClassification) e[0], e -> (Long) e[1]));
+		Map<ContactClassification, Long> resultMap = results.stream().collect(Collectors.toMap(e -> (ContactClassification) e[0], e -> (Long) e[1]));
 		return resultMap;
 	}
 
@@ -607,8 +613,7 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 		cq.multiselect(contact.get(Contact.FOLLOW_UP_STATUS), cb.count(contact));
 		List<Object[]> results = em.createQuery(cq).getResultList();
 
-		Map<FollowUpStatus, Long> resultMap = results.stream()
-				.collect(Collectors.toMap(e -> (FollowUpStatus) e[0], e -> (Long) e[1]));
+		Map<FollowUpStatus, Long> resultMap = results.stream().collect(Collectors.toMap(e -> (FollowUpStatus) e[0], e -> (Long) e[1]));
 		return resultMap;
 	}
 
@@ -698,12 +703,10 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 	 */
 	public void updateFollowUpUntilAndStatus(Contact contact) {
 		Disease disease = contact.getDisease();
-		boolean changeStatus = contact.getFollowUpStatus() != FollowUpStatus.CANCELED
-				&& contact.getFollowUpStatus() != FollowUpStatus.LOST;
+		boolean changeStatus = contact.getFollowUpStatus() != FollowUpStatus.CANCELED && contact.getFollowUpStatus() != FollowUpStatus.LOST;
 
 		ContactProximity contactProximity = contact.getContactProximity();
-		if (!diseaseConfigurationFacade.hasFollowUp(disease)
-				|| (contactProximity != null && !contactProximity.hasFollowUp())) {
+		if (!diseaseConfigurationFacade.hasFollowUp(disease) || (contactProximity != null && !contactProximity.hasFollowUp())) {
 			contact.setFollowUpUntil(null);
 			if (changeStatus) {
 				contact.setFollowUpStatus(FollowUpStatus.NO_FOLLOW_UP);
@@ -711,51 +714,52 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 		} else {
 			int followUpDuration = diseaseConfigurationFacade.getFollowUpDuration(disease);
 			LocalDate beginDate = DateHelper8.toLocalDate(ContactLogic.getStartDate(contact.getLastContactDate(), contact.getReportDateTime()));
-			LocalDate untilDate = contact.isOverwriteFollowUpUntil() ||
-					(contact.getFollowUpUntil() != null && DateHelper8.toLocalDate(contact.getFollowUpUntil()).isAfter(beginDate.plusDays(followUpDuration))) ?
-							DateHelper8.toLocalDate(contact.getFollowUpUntil()) : beginDate.plusDays(followUpDuration);
+			LocalDate untilDate = contact.isOverwriteFollowUpUntil()
+				|| (contact.getFollowUpUntil() != null
+					&& DateHelper8.toLocalDate(contact.getFollowUpUntil()).isAfter(beginDate.plusDays(followUpDuration)))
+						? DateHelper8.toLocalDate(contact.getFollowUpUntil())
+						: beginDate.plusDays(followUpDuration);
 
-							Visit lastVisit = null;
-							boolean additionalVisitNeeded;
-							do {
-								additionalVisitNeeded = false;
-								lastVisit = contact.getVisits().stream()
-										.max((v1, v2) -> v1.getVisitDateTime().compareTo(v2.getVisitDateTime()))
-										.orElse(null);
-								if (lastVisit != null) {
-									// if the last visit was not cooperative and happened at the last date of
-									// contact tracing ..
-									if (lastVisit.getVisitStatus() != VisitStatus.COOPERATIVE
-											&& DateHelper8.toLocalDate(lastVisit.getVisitDateTime()).isEqual(untilDate)) {
-										// .. we need to do an additional visit
-										additionalVisitNeeded = true;
-										untilDate = untilDate.plusDays(1);
-									}
-									// if the last visit was cooperative and happened at the last date of contact tracing,
-									// revert the follow-up until date back to the original
-									if (!contact.isOverwriteFollowUpUntil() && lastVisit.getVisitStatus() == VisitStatus.COOPERATIVE
-											&& DateHelper8.toLocalDate(lastVisit.getVisitDateTime()).isEqual(beginDate.plusDays(followUpDuration))) {
-										additionalVisitNeeded = false;
-										untilDate = beginDate.plusDays(followUpDuration);
-									}
-								}
-							} while (additionalVisitNeeded);
+			Visit lastVisit = null;
+			boolean additionalVisitNeeded;
+			do {
+				additionalVisitNeeded = false;
+				lastVisit = contact.getVisits().stream().max((v1, v2) -> v1.getVisitDateTime().compareTo(v2.getVisitDateTime())).orElse(null);
+				if (lastVisit != null) {
+					// if the last visit was not cooperative and happened at the last date of
+					// contact tracing ..
+					if (lastVisit.getVisitStatus() != VisitStatus.COOPERATIVE
+						&& DateHelper8.toLocalDate(lastVisit.getVisitDateTime()).isEqual(untilDate)) {
+						// .. we need to do an additional visit
+						additionalVisitNeeded = true;
+						untilDate = untilDate.plusDays(1);
+					}
+					// if the last visit was cooperative and happened at the last date of contact tracing,
+					// revert the follow-up until date back to the original
+					if (!contact.isOverwriteFollowUpUntil()
+						&& lastVisit.getVisitStatus() == VisitStatus.COOPERATIVE
+						&& DateHelper8.toLocalDate(lastVisit.getVisitDateTime()).isEqual(beginDate.plusDays(followUpDuration))) {
+						additionalVisitNeeded = false;
+						untilDate = beginDate.plusDays(followUpDuration);
+					}
+				}
+			}
+			while (additionalVisitNeeded);
 
-							contact.setFollowUpUntil(DateHelper8.toDate(untilDate));
-							if (changeStatus) {
-								if (lastVisit != null && DateHelper.isSameDay(lastVisit.getVisitDateTime(), DateHelper8.toDate(untilDate))) {
-									contact.setFollowUpStatus(FollowUpStatus.COMPLETED);
-								} else {
-									contact.setFollowUpStatus(FollowUpStatus.FOLLOW_UP);
-								}
+			contact.setFollowUpUntil(DateHelper8.toDate(untilDate));
+			if (changeStatus) {
+				if (lastVisit != null && DateHelper.isSameDay(lastVisit.getVisitDateTime(), DateHelper8.toDate(untilDate))) {
+					contact.setFollowUpStatus(FollowUpStatus.COMPLETED);
+				} else {
+					contact.setFollowUpStatus(FollowUpStatus.FOLLOW_UP);
+				}
 
-
-								if (contact.getFollowUpStatus() != FollowUpStatus.COMPLETED && contact.getContactStatus() == ContactStatus.CONVERTED) {
-									// Cancel follow-up if the contact was converted to a case
-									contact.setFollowUpStatus(FollowUpStatus.CANCELED);
-									contact.setFollowUpComment(I18nProperties.getString(Strings.messageSystemFollowUpCanceled));
-								}
-							}
+				if (contact.getFollowUpStatus() != FollowUpStatus.COMPLETED && contact.getContactStatus() == ContactStatus.CONVERTED) {
+					// Cancel follow-up if the contact was converted to a case
+					contact.setFollowUpStatus(FollowUpStatus.CANCELED);
+					contact.setFollowUpComment(I18nProperties.getString(Strings.messageSystemFollowUpCanceled));
+				}
+			}
 		}
 
 		ensurePersisted(contact);
@@ -790,12 +794,10 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public Predicate createUserFilterWithoutCase(CriteriaBuilder cb, CriteriaQuery cq,
-			From<Contact, Contact> contactPath) {
+	public Predicate createUserFilterWithoutCase(CriteriaBuilder cb, CriteriaQuery cq, From<Contact, Contact> contactPath) {
 		// National users can access all contacts in the system
 		User currentUser = getCurrentUser();
-		if (currentUser.hasAnyUserRole(UserRole.NATIONAL_USER, UserRole.NATIONAL_CLINICIAN, UserRole.NATIONAL_OBSERVER,
-				UserRole.REST_USER)) {
+		if (currentUser.hasAnyUserRole(UserRole.NATIONAL_USER, UserRole.NATIONAL_CLINICIAN, UserRole.NATIONAL_OBSERVER, UserRole.REST_USER)) {
 			if (currentUser.getLimitedDisease() != null) {
 				return cb.equal(contactPath.get(Contact.DISEASE), currentUser.getLimitedDisease());
 			} else {
@@ -822,8 +824,10 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 		Join<Contact, Case> caze = from.join(Contact.CAZE, JoinType.LEFT);
 
 		if (contactCriteria.getReportingUserRole() != null) {
-			filter = and(cb, filter, cb.isMember(contactCriteria.getReportingUserRole(),
-					from.join(Contact.REPORTING_USER, JoinType.LEFT).get(User.USER_ROLES)));
+			filter = and(
+				cb,
+				filter,
+				cb.isMember(contactCriteria.getReportingUserRole(), from.join(Contact.REPORTING_USER, JoinType.LEFT).get(User.USER_ROLES)));
 		}
 		if (contactCriteria.getDisease() != null) {
 			filter = and(cb, filter, cb.equal(from.get(Contact.DISEASE), contactCriteria.getDisease()));
@@ -832,28 +836,33 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 			filter = and(cb, filter, cb.equal(caze.get(Case.UUID), contactCriteria.getCaze().getUuid()));
 		}
 		if (contactCriteria.getRegion() != null) {
-			filter = and(cb, filter,
-					cb.or(cb.equal(from.join(Contact.REGION, JoinType.LEFT).get(Region.UUID),
-							contactCriteria.getRegion().getUuid()),
-							cb.and(cb.isNull(from.get(Contact.REGION)),
-									cb.equal(caze.join(Case.REGION, JoinType.LEFT).get(Region.UUID),
-											contactCriteria.getRegion().getUuid()))));
+			filter = and(
+				cb,
+				filter,
+				cb.or(
+					cb.equal(from.join(Contact.REGION, JoinType.LEFT).get(Region.UUID), contactCriteria.getRegion().getUuid()),
+					cb.and(
+						cb.isNull(from.get(Contact.REGION)),
+						cb.equal(caze.join(Case.REGION, JoinType.LEFT).get(Region.UUID), contactCriteria.getRegion().getUuid()))));
 		}
 		if (contactCriteria.getDistrict() != null) {
-			filter = and(cb, filter,
-					cb.or(cb.equal(from.join(Contact.DISTRICT, JoinType.LEFT).get(District.UUID),
-							contactCriteria.getDistrict().getUuid()),
-							cb.and(cb.isNull(from.get(Contact.DISTRICT)),
-									cb.equal(caze.join(Case.DISTRICT, JoinType.LEFT).get(District.UUID),
-											contactCriteria.getDistrict().getUuid()))));
+			filter = and(
+				cb,
+				filter,
+				cb.or(
+					cb.equal(from.join(Contact.DISTRICT, JoinType.LEFT).get(District.UUID), contactCriteria.getDistrict().getUuid()),
+					cb.and(
+						cb.isNull(from.get(Contact.DISTRICT)),
+						cb.equal(caze.join(Case.DISTRICT, JoinType.LEFT).get(District.UUID), contactCriteria.getDistrict().getUuid()))));
 		}
 		if (contactCriteria.getContactOfficer() != null) {
-			filter = and(cb, filter, cb.equal(from.join(Contact.CONTACT_OFFICER, JoinType.LEFT).get(User.UUID),
-					contactCriteria.getContactOfficer().getUuid()));
+			filter = and(
+				cb,
+				filter,
+				cb.equal(from.join(Contact.CONTACT_OFFICER, JoinType.LEFT).get(User.UUID), contactCriteria.getContactOfficer().getUuid()));
 		}
 		if (contactCriteria.getContactClassification() != null) {
-			filter = and(cb, filter,
-					cb.equal(from.get(Contact.CONTACT_CLASSIFICATION), contactCriteria.getContactClassification()));
+			filter = and(cb, filter, cb.equal(from.get(Contact.CONTACT_CLASSIFICATION), contactCriteria.getContactClassification()));
 		}
 		if (contactCriteria.getContactStatus() != null) {
 			filter = and(cb, filter, cb.equal(from.get(Contact.CONTACT_STATUS), contactCriteria.getContactStatus()));
@@ -862,48 +871,58 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 			filter = and(cb, filter, cb.equal(from.get(Contact.FOLLOW_UP_STATUS), contactCriteria.getFollowUpStatus()));
 		}
 		if (contactCriteria.getReportDateFrom() != null && contactCriteria.getReportDateTo() != null) {
-			filter = and(cb, filter, cb.between(from.get(Contact.REPORT_DATE_TIME), contactCriteria.getReportDateFrom(),
-					contactCriteria.getReportDateTo()));
+			filter = and(
+				cb,
+				filter,
+				cb.between(from.get(Contact.REPORT_DATE_TIME), contactCriteria.getReportDateFrom(), contactCriteria.getReportDateTo()));
 		} else if (contactCriteria.getReportDateFrom() != null) {
-			filter = and(cb, filter,
-					cb.greaterThanOrEqualTo(from.get(Contact.REPORT_DATE_TIME), contactCriteria.getReportDateFrom()));
+			filter = and(cb, filter, cb.greaterThanOrEqualTo(from.get(Contact.REPORT_DATE_TIME), contactCriteria.getReportDateFrom()));
 		} else if (contactCriteria.getReportDateTo() != null) {
-			filter = and(cb, filter,
-					cb.lessThanOrEqualTo(from.get(Contact.REPORT_DATE_TIME), contactCriteria.getReportDateTo()));
+			filter = and(cb, filter, cb.lessThanOrEqualTo(from.get(Contact.REPORT_DATE_TIME), contactCriteria.getReportDateTo()));
 		}
 		if (contactCriteria.getLastContactDateFrom() != null && contactCriteria.getLastContactDateTo() != null) {
-			filter = and(cb, filter, cb.between(from.get(Contact.LAST_CONTACT_DATE),
-					contactCriteria.getLastContactDateFrom(), contactCriteria.getLastContactDateTo()));
+			filter = and(
+				cb,
+				filter,
+				cb.between(from.get(Contact.LAST_CONTACT_DATE), contactCriteria.getLastContactDateFrom(), contactCriteria.getLastContactDateTo()));
 		}
 		if (contactCriteria.getFollowUpUntilFrom() != null && contactCriteria.getFollowUpUntilTo() != null) {
-			filter = and(cb, filter, cb.between(from.get(Contact.FOLLOW_UP_UNTIL),
-					contactCriteria.getFollowUpUntilFrom(), contactCriteria.getFollowUpUntilTo()));
+			filter = and(
+				cb,
+				filter,
+				cb.between(from.get(Contact.FOLLOW_UP_UNTIL), contactCriteria.getFollowUpUntilFrom(), contactCriteria.getFollowUpUntilTo()));
 		} else if (contactCriteria.getFollowUpUntilFrom() != null) {
-			filter = and(cb, filter,
-					cb.greaterThanOrEqualTo(from.get(Contact.FOLLOW_UP_UNTIL), contactCriteria.getFollowUpUntilFrom()));
+			filter = and(cb, filter, cb.greaterThanOrEqualTo(from.get(Contact.FOLLOW_UP_UNTIL), contactCriteria.getFollowUpUntilFrom()));
 		} else if (contactCriteria.getFollowUpUntilTo() != null) {
 			if (!Boolean.TRUE.equals(contactCriteria.getFollowUpUntilToPrecise())) {
-				filter = and(cb, filter,
-						cb.lessThanOrEqualTo(from.get(Contact.FOLLOW_UP_UNTIL), contactCriteria.getFollowUpUntilTo()));
+				filter = and(cb, filter, cb.lessThanOrEqualTo(from.get(Contact.FOLLOW_UP_UNTIL), contactCriteria.getFollowUpUntilTo()));
 			} else {
-				filter = and(cb, filter,
-						cb.between(from.get(Contact.FOLLOW_UP_UNTIL),
-								DateHelper.getStartOfDay(contactCriteria.getFollowUpUntilTo()),
-								DateHelper.getEndOfDay(contactCriteria.getFollowUpUntilTo())));
+				filter = and(
+					cb,
+					filter,
+					cb.between(
+						from.get(Contact.FOLLOW_UP_UNTIL),
+						DateHelper.getStartOfDay(contactCriteria.getFollowUpUntilTo()),
+						DateHelper.getEndOfDay(contactCriteria.getFollowUpUntilTo())));
 			}
 		}
 		if (contactCriteria.getQuarantineTo() != null) {
-			filter = and(cb, filter,
-					cb.between(from.get(Contact.QUARANTINE_TO),
-							DateHelper.getStartOfDay(contactCriteria.getQuarantineTo()),
-							DateHelper.getEndOfDay(contactCriteria.getQuarantineTo())));
+			filter = and(
+				cb,
+				filter,
+				cb.between(
+					from.get(Contact.QUARANTINE_TO),
+					DateHelper.getStartOfDay(contactCriteria.getQuarantineTo()),
+					DateHelper.getEndOfDay(contactCriteria.getQuarantineTo())));
 		}
 		if (contactCriteria.getQuarantineType() != null) {
 			filter = and(cb, filter, cb.equal(from.get(Contact.QUARANTINE), contactCriteria.getQuarantineType()));
 		}
 		if (Boolean.TRUE.equals(contactCriteria.getOnlyQuarantineHelpNeeded())) {
-			filter = and(cb, filter, cb.and(cb.notEqual(from.get(Contact.QUARANTINE_HELP_NEEDED), ""),
-					cb.isNotNull(from.get(Contact.QUARANTINE_HELP_NEEDED))));
+			filter = and(
+				cb,
+				filter,
+				cb.and(cb.notEqual(from.get(Contact.QUARANTINE_HELP_NEEDED), ""), cb.isNotNull(from.get(Contact.QUARANTINE_HELP_NEEDED))));
 		}
 		if (Boolean.TRUE.equals(contactCriteria.getQuarantineOrderedVerbally())) {
 			filter = and(cb, filter, cb.isTrue(from.get(Contact.QUARANTINE_ORDERED_VERBALLY)));
@@ -912,13 +931,16 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 			filter = and(cb, filter, cb.isTrue(from.get(Contact.QUARANTINE_ORDERED_OFFICIAL_DOCUMENT)));
 		}
 		if (Boolean.TRUE.equals(contactCriteria.getQuarantineNotOrdered())) {
-			filter = and(cb, filter, cb.and(cb.isFalse(from.get(Contact.QUARANTINE_ORDERED_VERBALLY)),
+			filter = and(
+				cb,
+				filter,
+				cb.and(
+					cb.isFalse(from.get(Contact.QUARANTINE_ORDERED_VERBALLY)),
 					cb.isFalse(from.get(Contact.QUARANTINE_ORDERED_OFFICIAL_DOCUMENT))));
 		}
 		if (contactCriteria.getRelevanceStatus() != null) {
 			if (contactCriteria.getRelevanceStatus() == EntityRelevanceStatus.ACTIVE) {
-				filter = and(cb, filter,
-						cb.or(cb.equal(caze.get(Case.ARCHIVED), false), cb.isNull(caze.get(Case.ARCHIVED))));
+				filter = and(cb, filter, cb.or(cb.equal(caze.get(Case.ARCHIVED), false), cb.isNull(caze.get(Case.ARCHIVED))));
 			} else if (contactCriteria.getRelevanceStatus() == EntityRelevanceStatus.ARCHIVED) {
 				filter = and(cb, filter, cb.equal(caze.get(Case.ARCHIVED), true));
 			}
@@ -933,12 +955,13 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 			for (int i = 0; i < textFilters.length; i++) {
 				String textFilter = "%" + textFilters[i].toLowerCase() + "%";
 				if (!DataHelper.isNullOrEmpty(textFilter)) {
-					Predicate likeFilters = cb.or(cb.like(cb.lower(from.get(Contact.UUID)), textFilter),
-							cb.like(cb.lower(person.get(Person.FIRST_NAME)), textFilter),
-							cb.like(cb.lower(person.get(Person.LAST_NAME)), textFilter),
-							cb.like(cb.lower(caze.get(Case.UUID)), textFilter),
-							cb.like(cb.lower(casePerson.get(Person.FIRST_NAME)), textFilter),
-							cb.like(cb.lower(casePerson.get(Person.LAST_NAME)), textFilter));
+					Predicate likeFilters = cb.or(
+						cb.like(cb.lower(from.get(Contact.UUID)), textFilter),
+						cb.like(cb.lower(person.get(Person.FIRST_NAME)), textFilter),
+						cb.like(cb.lower(person.get(Person.LAST_NAME)), textFilter),
+						cb.like(cb.lower(caze.get(Case.UUID)), textFilter),
+						cb.like(cb.lower(casePerson.get(Person.FIRST_NAME)), textFilter),
+						cb.like(cb.lower(casePerson.get(Person.LAST_NAME)), textFilter));
 					filter = and(cb, filter, likeFilters);
 				}
 			}
@@ -947,12 +970,10 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 			filter = and(cb, filter, cb.equal(from.get(Contact.HIGH_PRIORITY), true));
 		}
 		if (contactCriteria.getContactCategory() != null) {
-			filter = and(cb, filter,
-					cb.equal(from.get(Contact.CONTACT_CATEGORY), contactCriteria.getContactCategory()));
+			filter = and(cb, filter, cb.equal(from.get(Contact.CONTACT_CATEGORY), contactCriteria.getContactCategory()));
 		}
 		if (contactCriteria.getCaseClassification() != null) {
-			filter = and(cb, filter,
-					cb.equal(caze.get(Case.CASE_CLASSIFICATION), contactCriteria.getCaseClassification()));
+			filter = and(cb, filter, cb.equal(caze.get(Case.CASE_CLASSIFICATION), contactCriteria.getCaseClassification()));
 		}
 
 		return filter;
@@ -966,9 +987,7 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 			taskService.delete(task);
 		}
 
-		contact.getSamples().stream()
-				.filter(sample -> sample.getAssociatedCase() == null)
-				.forEach(sample -> sampleService.delete(sample));
+		contact.getSamples().stream().filter(sample -> sample.getAssociatedCase() == null).forEach(sample -> sampleService.delete(sample));
 
 		super.delete(contact);
 	}
@@ -980,8 +999,7 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 	 */
 	public Predicate createActiveContactsFilter(CriteriaBuilder cb, Root<Contact> root) {
 		Join<Contact, Case> caze = root.join(Contact.CAZE, JoinType.LEFT);
-		return cb.and(cb.or(cb.isNull(root.get(Contact.CAZE)), cb.isFalse(caze.get(Case.ARCHIVED))),
-				cb.isFalse(root.get(Contact.DELETED)));
+		return cb.and(cb.or(cb.isNull(root.get(Contact.CAZE)), cb.isFalse(caze.get(Case.ARCHIVED))), cb.isFalse(root.get(Contact.DELETED)));
 	}
 
 	/**
@@ -995,14 +1013,16 @@ public class ContactService extends AbstractCoreAdoService<Contact> {
 
 	private Predicate buildDateFilter(CriteriaBuilder cb, Root<Contact> contact, Date from, Date to) {
 		return cb.and(
-				cb.or(cb.and(cb.isNotNull(contact.get(Contact.FOLLOW_UP_UNTIL)),
-						cb.greaterThanOrEqualTo(contact.get(Contact.FOLLOW_UP_UNTIL), from)),
-						cb.or(cb.and(cb.isNotNull(contact.get(Contact.LAST_CONTACT_DATE)),
-								cb.greaterThanOrEqualTo(contact.get(Contact.LAST_CONTACT_DATE), from)),
-								cb.greaterThanOrEqualTo(contact.get(Contact.REPORT_DATE_TIME), from))),
-				cb.or(cb.and(cb.isNotNull(contact.get(Contact.LAST_CONTACT_DATE)),
-						cb.lessThanOrEqualTo(contact.get(Contact.LAST_CONTACT_DATE), to)),
-						cb.lessThanOrEqualTo(contact.get(Contact.REPORT_DATE_TIME), to)));
+			cb.or(
+				cb.and(cb.isNotNull(contact.get(Contact.FOLLOW_UP_UNTIL)), cb.greaterThanOrEqualTo(contact.get(Contact.FOLLOW_UP_UNTIL), from)),
+				cb.or(
+					cb.and(
+						cb.isNotNull(contact.get(Contact.LAST_CONTACT_DATE)),
+						cb.greaterThanOrEqualTo(contact.get(Contact.LAST_CONTACT_DATE), from)),
+					cb.greaterThanOrEqualTo(contact.get(Contact.REPORT_DATE_TIME), from))),
+			cb.or(
+				cb.and(cb.isNotNull(contact.get(Contact.LAST_CONTACT_DATE)), cb.lessThanOrEqualTo(contact.get(Contact.LAST_CONTACT_DATE), to)),
+				cb.lessThanOrEqualTo(contact.get(Contact.REPORT_DATE_TIME), to)));
 	}
 
 }

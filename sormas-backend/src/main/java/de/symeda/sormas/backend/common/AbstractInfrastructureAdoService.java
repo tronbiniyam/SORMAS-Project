@@ -21,8 +21,8 @@ public abstract class AbstractInfrastructureAdoService<ADO extends Infrastructur
 		em.persist(archiveme);
 		em.flush();
 	}
-	
-	public Predicate createBasicFilter(CriteriaBuilder cb, Root<ADO> root) {		
+
+	public Predicate createBasicFilter(CriteriaBuilder cb, Root<ADO> root) {
 		return cb.isFalse(root.get(InfrastructureAdo.ARCHIVED));
 	}
 
@@ -52,21 +52,19 @@ public abstract class AbstractInfrastructureAdoService<ADO extends Infrastructur
 		return isUsedInInfrastructureData(uuidList, adoAttribute, targetElementClass);
 	}
 
-	public <T extends InfrastructureAdo> boolean isUsedInInfrastructureData(Collection<String> uuids, String adoAttribute, Class<T> targetElementClass) {
+	public <T extends InfrastructureAdo> boolean isUsedInInfrastructureData(
+		Collection<String> uuids,
+		String adoAttribute,
+		Class<T> targetElementClass) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<T> cq = cb.createQuery(targetElementClass);
 		Root<T> root = cq.from(targetElementClass);
 		Join<T, ADO> join = root.join(adoAttribute);
 
 		cq.where(
-				cb.and(
-						cb.or(
-								cb.isNull(root.get(InfrastructureAdo.ARCHIVED)),
-								cb.isFalse(root.get(InfrastructureAdo.ARCHIVED))
-								),
-						join.get(InfrastructureAdo.UUID).in(uuids)
-						)
-				);
+			cb.and(
+				cb.or(cb.isNull(root.get(InfrastructureAdo.ARCHIVED)), cb.isFalse(root.get(InfrastructureAdo.ARCHIVED))),
+				join.get(InfrastructureAdo.UUID).in(uuids)));
 
 		cq.select(join.get(InfrastructureAdo.ID));
 

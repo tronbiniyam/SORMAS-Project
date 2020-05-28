@@ -51,8 +51,8 @@ public class PopulationDataView extends AbstractConfigurationView {
 		layout.addComponent(btnExport);
 		layout.setComponentAlignment(btnExport, Alignment.MIDDLE_CENTER);
 
-		StreamResource populationDataExportResource = DownloadUtil.createPopulationDataExportResource("sormas_population_data_"
-				+ DateHelper.formatDateForExport(new Date()) + ".csv");
+		StreamResource populationDataExportResource =
+			DownloadUtil.createPopulationDataExportResource("sormas_population_data_" + DateHelper.formatDateForExport(new Date()) + ".csv");
 		new FileDownloader(populationDataExportResource).extend(btnExport);
 
 		addComponent(layout);

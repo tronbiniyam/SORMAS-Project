@@ -50,7 +50,7 @@ public class DistrictFacadeEjbTest extends AbstractBeanTest {
 		creator.createDistrict("d1", r);
 		District d2 = creator.createDistrict("d2", r);
 		getDistrictFacade().archive(d2.getUuid());
-		
+
 		assertEquals(1, getDistrictFacade().getAllActiveAsReference().size());
 	}
 
@@ -60,7 +60,7 @@ public class DistrictFacadeEjbTest extends AbstractBeanTest {
 		creator.createDistrict("d1", r);
 		District d2 = creator.createDistrict("d2", r);
 		getDistrictFacade().archive(d2.getUuid());
-		
+
 		assertEquals(1, getDistrictFacade().getAllActiveByRegion(r.getUuid()).size());
 	}
 

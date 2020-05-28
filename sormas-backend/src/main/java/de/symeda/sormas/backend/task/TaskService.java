@@ -9,11 +9,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *******************************************************************************/
 package de.symeda.sormas.backend.task;
 
@@ -75,7 +75,7 @@ public class TaskService extends AbstractAdoService<Task> {
 
 		if (date != null) {
 			Predicate dateFilter = createChangeDateFilter(cb, from, date);
-			filter = AbstractAdoService.and(cb, filter, dateFilter);	
+			filter = AbstractAdoService.and(cb, filter, dateFilter);
 		}
 
 		cq.where(filter);
@@ -102,7 +102,7 @@ public class TaskService extends AbstractAdoService<Task> {
 
 		return em.createQuery(cq).getResultList();
 	}
-	
+
 	/**
 	 * @see /sormas-backend/doc/UserDataAccess.md
 	 */
@@ -111,11 +111,7 @@ public class TaskService extends AbstractAdoService<Task> {
 	public Predicate createUserFilter(CriteriaBuilder cb, CriteriaQuery cq, From<Task, Task> taskPath) {
 		// National users can access all tasks in the system
 		User currentUser = getCurrentUser();
-		if (currentUser.hasAnyUserRole(
-				UserRole.NATIONAL_USER,
-				UserRole.NATIONAL_CLINICIAN,
-				UserRole.NATIONAL_OBSERVER,
-				UserRole.REST_USER)) {
+		if (currentUser.hasAnyUserRole(UserRole.NATIONAL_USER, UserRole.NATIONAL_CLINICIAN, UserRole.NATIONAL_OBSERVER, UserRole.REST_USER)) {
 			return null;
 		}
 
@@ -126,7 +122,7 @@ public class TaskService extends AbstractAdoService<Task> {
 		Predicate caseFilter = caseService.createUserFilter(cb, cq, taskPath.join(Task.CAZE, JoinType.LEFT));
 		if (caseFilter != null) {
 			filter = cb.or(filter, caseFilter);
-		} 
+		}
 		Predicate contactFilter = contactService.createUserFilter(cb, cq, taskPath.join(Task.CONTACT, JoinType.LEFT));
 		if (contactFilter != null) {
 			filter = cb.or(filter, contactFilter);
@@ -169,7 +165,7 @@ public class TaskService extends AbstractAdoService<Task> {
 		cq.orderBy(cb.asc(from.get(Task.CREATION_DATE)));
 
 		List<Task> resultList = em.createQuery(cq).getResultList();
-		return resultList;	
+		return resultList;
 	}
 
 	public Predicate buildCriteriaFilter(TaskCriteria taskCriteria, CriteriaBuilder cb, Root<Task> from) {
@@ -189,7 +185,10 @@ public class TaskService extends AbstractAdoService<Task> {
 			filter = and(cb, filter, cb.equal(from.join(Task.ASSIGNEE_USER, JoinType.LEFT).get(User.UUID), taskCriteria.getAssigneeUser().getUuid()));
 		}
 		if (taskCriteria.getExcludeAssigneeUser() != null) {
-			filter = and(cb, filter, cb.notEqual(from.join(Task.ASSIGNEE_USER, JoinType.LEFT).get(User.UUID), taskCriteria.getExcludeAssigneeUser().getUuid()));
+			filter = and(
+				cb,
+				filter,
+				cb.notEqual(from.join(Task.ASSIGNEE_USER, JoinType.LEFT).get(User.UUID), taskCriteria.getExcludeAssigneeUser().getUuid()));
 		}
 		if (taskCriteria.getCaze() != null) {
 			filter = and(cb, filter, cb.equal(from.join(Task.CAZE, JoinType.LEFT).get(Case.UUID), taskCriteria.getCaze().getUuid()));
@@ -198,7 +197,10 @@ public class TaskService extends AbstractAdoService<Task> {
 			filter = and(cb, filter, cb.equal(from.join(Task.CONTACT, JoinType.LEFT).get(User.UUID), taskCriteria.getContact().getUuid()));
 		}
 		if (taskCriteria.getContactPerson() != null) {
-			filter = and(cb, filter, cb.equal(
+			filter = and(
+				cb,
+				filter,
+				cb.equal(
 					from.join(Task.CONTACT, JoinType.LEFT).join(Contact.PERSON, JoinType.LEFT).get(User.UUID),
 					taskCriteria.getContactPerson().getUuid()));
 		}
@@ -221,17 +223,13 @@ public class TaskService extends AbstractAdoService<Task> {
 			if (taskCriteria.getRelevanceStatus() == EntityRelevanceStatus.ACTIVE) {
 				filter = and(cb, filter, buildActiveTasksFilter(cb, from));
 			} else if (taskCriteria.getRelevanceStatus() == EntityRelevanceStatus.ARCHIVED) {
-				filter = and(cb, filter, 
-						cb.or(
-								cb.and(
-										cb.equal(from.get(Task.TASK_CONTEXT), TaskContext.CASE),
-										cb.equal(caze.get(Case.ARCHIVED), true)),
-								cb.and(
-										cb.equal(from.get(Task.TASK_CONTEXT), TaskContext.CONTACT),
-										cb.equal(contactCaze.get(Case.ARCHIVED), true)),
-								cb.and(
-										cb.equal(from.get(Task.TASK_CONTEXT), TaskContext.EVENT),
-										cb.equal(event.get(Event.ARCHIVED), true))));
+				filter = and(
+					cb,
+					filter,
+					cb.or(
+						cb.and(cb.equal(from.get(Task.TASK_CONTEXT), TaskContext.CASE), cb.equal(caze.get(Case.ARCHIVED), true)),
+						cb.and(cb.equal(from.get(Task.TASK_CONTEXT), TaskContext.CONTACT), cb.equal(contactCaze.get(Case.ARCHIVED), true)),
+						cb.and(cb.equal(from.get(Task.TASK_CONTEXT), TaskContext.EVENT), cb.equal(event.get(Event.ARCHIVED), true))));
 			}
 		}
 		return filter;
@@ -244,24 +242,16 @@ public class TaskService extends AbstractAdoService<Task> {
 		Join<Task, Event> event = from.join(Task.EVENT, JoinType.LEFT);
 
 		Predicate filter = cb.or(
-				cb.equal(from.get(Task.TASK_CONTEXT), TaskContext.GENERAL),
-				cb.and(
-						cb.equal(from.get(Task.TASK_CONTEXT), TaskContext.CASE),
-						cb.or(
-								cb.equal(caze.get(Case.ARCHIVED), false),
-								cb.isNull(caze.get(Case.ARCHIVED)))
-						),
-				cb.and(
-						cb.equal(from.get(Task.TASK_CONTEXT), TaskContext.CONTACT),
-						cb.or(
-								cb.equal(contactCaze.get(Case.ARCHIVED), false),
-								cb.isNull(contactCaze.get(Case.ARCHIVED)))
-						),
-				cb.and(
-						cb.equal(from.get(Task.TASK_CONTEXT), TaskContext.EVENT),
-						cb.or(
-								cb.equal(event.get(Event.ARCHIVED), false),
-								cb.isNull(event.get(Event.ARCHIVED)))));
+			cb.equal(from.get(Task.TASK_CONTEXT), TaskContext.GENERAL),
+			cb.and(
+				cb.equal(from.get(Task.TASK_CONTEXT), TaskContext.CASE),
+				cb.or(cb.equal(caze.get(Case.ARCHIVED), false), cb.isNull(caze.get(Case.ARCHIVED)))),
+			cb.and(
+				cb.equal(from.get(Task.TASK_CONTEXT), TaskContext.CONTACT),
+				cb.or(cb.equal(contactCaze.get(Case.ARCHIVED), false), cb.isNull(contactCaze.get(Case.ARCHIVED)))),
+			cb.and(
+				cb.equal(from.get(Task.TASK_CONTEXT), TaskContext.EVENT),
+				cb.or(cb.equal(event.get(Event.ARCHIVED), false), cb.isNull(event.get(Event.ARCHIVED)))));
 
 		return filter;
 	}
