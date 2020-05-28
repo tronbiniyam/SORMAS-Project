@@ -9,11 +9,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *******************************************************************************/
 package de.symeda.sormas.ui.task;
 
@@ -53,10 +53,13 @@ public class TaskController {
 	public void create(TaskContext context, ReferenceDto entityRef, Runnable callback) {
 		TaskEditForm createForm = new TaskEditForm(true);
 		createForm.setValue(createNewTask(context, entityRef));
-		final CommitDiscardWrapperComponent<TaskEditForm> editView = new CommitDiscardWrapperComponent<TaskEditForm>(createForm, 
-				UserProvider.getCurrent().hasUserRight(UserRight.TASK_CREATE), createForm.getFieldGroup());
+		final CommitDiscardWrapperComponent<TaskEditForm> editView = new CommitDiscardWrapperComponent<TaskEditForm>(
+			createForm,
+			UserProvider.getCurrent().hasUserRight(UserRight.TASK_CREATE),
+			createForm.getFieldGroup());
 
 		editView.addCommitListener(new CommitListener() {
+
 			@Override
 			public void onCommit() {
 				if (!createForm.getFieldGroup().isModified()) {
@@ -67,7 +70,7 @@ public class TaskController {
 			}
 		});
 
-		VaadinUiUtil.showModalPopupWindow(editView, I18nProperties.getString(Strings.headingCreateNewTask));   
+		VaadinUiUtil.showModalPopupWindow(editView, I18nProperties.getString(Strings.headingCreateNewTask));
 	}
 
 	public void createSampleCollectionTask(TaskContext context, ReferenceDto entityRef, SampleDto sample) {
@@ -78,9 +81,12 @@ public class TaskController {
 		taskDto.setAssigneeUser(sample.getReportingUser());
 		createForm.setValue(taskDto);
 
-		final CommitDiscardWrapperComponent<TaskEditForm> createView = new CommitDiscardWrapperComponent<TaskEditForm>(createForm, 
-				UserProvider.getCurrent().hasUserRight(UserRight.TASK_CREATE), createForm.getFieldGroup());
+		final CommitDiscardWrapperComponent<TaskEditForm> createView = new CommitDiscardWrapperComponent<TaskEditForm>(
+			createForm,
+			UserProvider.getCurrent().hasUserRight(UserRight.TASK_CREATE),
+			createForm.getFieldGroup());
 		createView.addCommitListener(new CommitListener() {
+
 			@Override
 			public void onCommit() {
 				if (!createForm.getFieldGroup().isModified()) {
@@ -99,12 +105,13 @@ public class TaskController {
 
 		TaskEditForm form = new TaskEditForm(false);
 		form.setValue(newDto);
-		final CommitDiscardWrapperComponent<TaskEditForm> editView = new CommitDiscardWrapperComponent<TaskEditForm>(form, 
-				UserProvider.getCurrent().hasUserRight(UserRight.TASK_EDIT), form.getFieldGroup());
+		final CommitDiscardWrapperComponent<TaskEditForm> editView =
+			new CommitDiscardWrapperComponent<TaskEditForm>(form, UserProvider.getCurrent().hasUserRight(UserRight.TASK_EDIT), form.getFieldGroup());
 
 		Window popupWindow = VaadinUiUtil.showModalPopupWindow(editView, I18nProperties.getString(Strings.headingEditTask));
 
 		editView.addCommitListener(new CommitListener() {
+
 			@Override
 			public void onCommit() {
 				if (!form.getFieldGroup().isModified()) {
@@ -117,6 +124,7 @@ public class TaskController {
 		});
 
 		editView.addDiscardListener(new DiscardListener() {
+
 			@Override
 			public void onDiscard() {
 				popupWindow.close();
@@ -125,6 +133,7 @@ public class TaskController {
 
 		if (UserProvider.getCurrent().hasUserRole(UserRole.ADMIN)) {
 			editView.addDeleteListener(new DeleteListener() {
+
 				@Override
 				public void onDelete() {
 					FacadeProvider.getTaskFacade().deleteTask(newDto);
@@ -145,23 +154,32 @@ public class TaskController {
 		long taskCount = FacadeProvider.getTaskFacade().getPendingTaskCount(user.getUuid());
 		return user.getCaption() + " (" + taskCount + ")";
 	}
-	
+
 	public void deleteAllSelectedItems(Collection<TaskIndexDto> selectedRows, Runnable callback) {
 		if (selectedRows.size() == 0) {
-			new Notification(I18nProperties.getString(Strings.headingNoTasksSelected), 
-					I18nProperties.getString(Strings.messageNoTasksSelected), Type.WARNING_MESSAGE, false).show(Page.getCurrent());
+			new Notification(
+				I18nProperties.getString(Strings.headingNoTasksSelected),
+				I18nProperties.getString(Strings.messageNoTasksSelected),
+				Type.WARNING_MESSAGE,
+				false).show(Page.getCurrent());
 		} else {
-			VaadinUiUtil.showDeleteConfirmationWindow(String.format(I18nProperties.getString(Strings.confirmationDeleteTasks), selectedRows.size()), new Runnable() {
-				public void run() {
-					for (TaskIndexDto selectedRow : selectedRows) {
-						FacadeProvider.getTaskFacade().deleteTask(FacadeProvider.getTaskFacade().getByUuid(selectedRow.getUuid()));
+			VaadinUiUtil.showDeleteConfirmationWindow(
+				String.format(I18nProperties.getString(Strings.confirmationDeleteTasks), selectedRows.size()),
+				new Runnable() {
+
+					public void run() {
+						for (TaskIndexDto selectedRow : selectedRows) {
+							FacadeProvider.getTaskFacade().deleteTask(FacadeProvider.getTaskFacade().getByUuid(selectedRow.getUuid()));
+						}
+						callback.run();
+						new Notification(
+							I18nProperties.getString(Strings.headingTasksDeleted),
+							I18nProperties.getString(Strings.messageTasksDeleted),
+							Type.HUMANIZED_MESSAGE,
+							false).show(Page.getCurrent());
 					}
-					callback.run();
-					new Notification(I18nProperties.getString(Strings.headingTasksDeleted), 
-							I18nProperties.getString(Strings.messageTasksDeleted), Type.HUMANIZED_MESSAGE, false).show(Page.getCurrent());
-				}
-			});
+				});
 		}
 	}
-	
+
 }

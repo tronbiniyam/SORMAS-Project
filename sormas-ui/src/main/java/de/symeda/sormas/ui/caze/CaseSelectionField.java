@@ -2,7 +2,6 @@ package de.symeda.sormas.ui.caze;
 
 import java.util.function.Consumer;
 
-import de.symeda.sormas.ui.utils.ButtonHelper;
 import org.apache.commons.lang3.StringUtils;
 
 import com.vaadin.ui.Button;
@@ -19,7 +18,7 @@ import de.symeda.sormas.api.caze.CaseIndexDto;
 import de.symeda.sormas.api.i18n.Captions;
 import de.symeda.sormas.api.i18n.I18nProperties;
 import de.symeda.sormas.api.i18n.Strings;
-import de.symeda.sormas.ui.utils.CssStyles;
+import de.symeda.sormas.ui.utils.ButtonHelper;
 import de.symeda.sormas.ui.utils.VaadinUiUtil;
 
 @SuppressWarnings("serial")

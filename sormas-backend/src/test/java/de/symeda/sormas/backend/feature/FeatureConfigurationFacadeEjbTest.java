@@ -21,15 +21,16 @@ public class FeatureConfigurationFacadeEjbTest extends AbstractBeanTest {
 
 	@Test
 	public void testIsTaskGenerationFeatureEnabled() throws Exception {
-		FeatureConfigurationIndexDto featureConfiguration = new FeatureConfigurationIndexDto(DataHelper.createUuid(), null, null, null, null, null, false, null);
+		FeatureConfigurationIndexDto featureConfiguration =
+			new FeatureConfigurationIndexDto(DataHelper.createUuid(), null, null, null, null, null, false, null);
 		getFeatureConfigurationFacade().saveFeatureConfiguration(featureConfiguration, FeatureType.TASK_GENERATION_CASE_SURVEILLANCE);
-		
+
 		RDCFEntities rdcf = creator.createRDCFEntities();
 		UserReferenceDto user = creator.createUser(rdcf, UserRole.SURVEILLANCE_SUPERVISOR).toReference();
 		PersonReferenceDto person = creator.createPerson("Case", "Person").toReference();
-		
+
 		CaseDataDto caze = creator.createCase(user, person, rdcf);
-		
+
 		List<TaskDto> caseTasks = getTaskFacade().getAllPendingByCase(caze.toReference());
 		assertEquals(0, caseTasks.size());
 	}

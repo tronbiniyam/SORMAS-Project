@@ -53,7 +53,9 @@ public class LineListingRegionsLayout extends CssLayout {
 			}
 
 			Button configButton = ButtonHelper.createButtonWithCaption("region-" + regionUuid, captionBuilder.toString(), e -> {
-				SormasUI.get().getNavigator().navigateTo(LineListingConfigurationView.VIEW_NAME + "/" + regionUuid + "/?disease=" + disease.getName());
+				SormasUI.get()
+					.getNavigator()
+					.navigateTo(LineListingConfigurationView.VIEW_NAME + "/" + regionUuid + "/?disease=" + disease.getName());
 			}, ValoTheme.BUTTON_BORDERLESS, CssStyles.BUTTON_FILTER, CssStyles.HSPACE_LEFT_4, CssStyles.VSPACE_4);
 			configButton.setCaptionAsHtml(true);
 

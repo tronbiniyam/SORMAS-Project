@@ -13,7 +13,7 @@ import com.vaadin.v7.ui.DateField;
 import com.vaadin.v7.ui.Field;
 
 public abstract class AbstractForm<T> extends CustomField<T> {
-	
+
 	protected final String propertyI18nPrefix;
 	private final BeanFieldGroup<T> fieldGroup;
 	private Class<T> type;
@@ -113,7 +113,9 @@ public abstract class AbstractForm<T> extends CustomField<T> {
 		return addField(getContent(), configuration);
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({
+		"unchecked",
+		"rawtypes" })
 	protected <T extends Field> T addField(CustomLayout layout, FieldConfiguration configuration) {
 		Field field = addField(layout, configuration.getPropertyId());
 
@@ -162,12 +164,16 @@ public abstract class AbstractForm<T> extends CustomField<T> {
 		}
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({
+		"unchecked",
+		"rawtypes" })
 	protected <T extends Field> T addField(String propertyId) {
 		return (T) addField(propertyId, Field.class);
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({
+		"unchecked",
+		"rawtypes" })
 	protected <T extends Field> T addField(CustomLayout layout, String propertyId) {
 		return (T) addField(layout, propertyId, Field.class);
 	}
@@ -203,8 +209,9 @@ public abstract class AbstractForm<T> extends CustomField<T> {
 
 	@SuppressWarnings("rawtypes")
 	/**
-	 * @param allowedDaysInFuture How many days in the future the value of this field can be or
-	 * -1 for no restriction at all
+	 * @param allowedDaysInFuture
+	 *            How many days in the future the value of this field can be or
+	 *            -1 for no restriction at all
 	 */
 	protected <T extends Field> T addDateField(String propertyId, Class<T> fieldType, int allowedDaysInFuture) {
 		T field = getFieldGroup().buildAndBind(propertyId, (Object) propertyId, fieldType);
@@ -227,8 +234,7 @@ public abstract class AbstractForm<T> extends CustomField<T> {
 			return field;
 		}
 
-		if (DateField.class.isAssignableFrom(field.getClass())
-				|| DateTimeField.class.isAssignableFrom(field.getClass())) {
+		if (DateField.class.isAssignableFrom(field.getClass()) || DateTimeField.class.isAssignableFrom(field.getClass())) {
 			field.addValidator(new FutureDateValidator(field, amountOfDays, field.getCaption()));
 		}
 
@@ -267,5 +273,5 @@ public abstract class AbstractForm<T> extends CustomField<T> {
 	protected String getPropertyI18nPrefix() {
 		return propertyI18nPrefix;
 	}
-	
+
 }

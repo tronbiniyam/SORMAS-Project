@@ -18,7 +18,7 @@ public class PointOfEntryServiceTest extends AbstractBeanTest {
 		District district = creator.createDistrict("District", region);
 		District otherDistrict = creator.createDistrict("Other District", region);
 		creator.createPointOfEntry("Point of Entry", region, district);
-		
+
 		assertThat(getPointOfEntryService().getByName("Point of Entry", district), hasSize(1));
 		assertThat(getPointOfEntryService().getByName(" Point of Entry ", district), hasSize(1));
 		assertThat(getPointOfEntryService().getByName("point of entry", district), hasSize(1));

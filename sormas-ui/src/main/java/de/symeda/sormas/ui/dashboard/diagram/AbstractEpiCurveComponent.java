@@ -9,11 +9,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *******************************************************************************/
 package de.symeda.sormas.ui.dashboard.diagram;
 
@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
-import de.symeda.sormas.ui.utils.ButtonHelper;
 import org.vaadin.hene.popupbutton.PopupButton;
 
 import com.vaadin.icons.VaadinIcons;
@@ -41,6 +40,7 @@ import de.symeda.sormas.api.i18n.Strings;
 import de.symeda.sormas.api.utils.DateHelper;
 import de.symeda.sormas.ui.dashboard.DashboardDataProvider;
 import de.symeda.sormas.ui.highcharts.HighChart;
+import de.symeda.sormas.ui.utils.ButtonHelper;
 import de.symeda.sormas.ui.utils.CssStyles;
 
 @SuppressWarnings("serial")
@@ -96,8 +96,10 @@ public abstract class AbstractEpiCurveComponent extends VerticalLayout {
 		epiCurveHeaderLayout.setExpandRatio(epiCurveLabel, 1);
 
 		// "Expand" and "Collapse" buttons
-		Button expandEpiCurveButton = ButtonHelper.createIconButtonWithCaption("expandEpiCurve", "", VaadinIcons.EXPAND, null, CssStyles.BUTTON_SUBTLE, CssStyles.VSPACE_NONE);
-		Button collapseEpiCurveButton = ButtonHelper.createIconButtonWithCaption("collapseEpiCurve", "", VaadinIcons.COMPRESS, null, CssStyles.BUTTON_SUBTLE, CssStyles.VSPACE_NONE);
+		Button expandEpiCurveButton =
+			ButtonHelper.createIconButtonWithCaption("expandEpiCurve", "", VaadinIcons.EXPAND, null, CssStyles.BUTTON_SUBTLE, CssStyles.VSPACE_NONE);
+		Button collapseEpiCurveButton = ButtonHelper
+			.createIconButtonWithCaption("collapseEpiCurve", "", VaadinIcons.COMPRESS, null, CssStyles.BUTTON_SUBTLE, CssStyles.VSPACE_NONE);
 
 		expandEpiCurveButton.addClickListener(e -> {
 			externalExpandListener.accept(true);

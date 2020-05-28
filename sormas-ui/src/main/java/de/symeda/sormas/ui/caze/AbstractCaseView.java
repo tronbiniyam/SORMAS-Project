@@ -9,11 +9,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *******************************************************************************/
 package de.symeda.sormas.ui.caze;
 
@@ -72,7 +72,9 @@ public abstract class AbstractCaseView extends AbstractSubNavigationView {
 
 		if (!ViewModelProviders.of(AbstractCaseView.class).has(ViewConfiguration.class)) {
 			// init default view mode
-			ViewConfiguration initViewConfiguration = UserProvider.getCurrent().hasUserRight(UserRight.CASE_MANAGEMENT_ACCESS) ? new ViewConfiguration(ViewMode.NORMAL) : new ViewConfiguration(ViewMode.SIMPLE);
+			ViewConfiguration initViewConfiguration = UserProvider.getCurrent().hasUserRight(UserRight.CASE_MANAGEMENT_ACCESS)
+				? new ViewConfiguration(ViewMode.NORMAL)
+				: new ViewConfiguration(ViewMode.SIMPLE);
 			ViewModelProviders.of(AbstractCaseView.class).get(ViewConfiguration.class, initViewConfiguration);
 		}
 
@@ -80,24 +82,23 @@ public abstract class AbstractCaseView extends AbstractSubNavigationView {
 		this.redirectSimpleModeToCaseDataView = redirectSimpleModeToCaseDataView;
 
 		viewModeToggle = new OptionGroup();
-		CssStyles.style(viewModeToggle, 
-				ValoTheme.OPTIONGROUP_HORIZONTAL, CssStyles.OPTIONGROUP_HORIZONTAL_PRIMARY,
-				CssStyles.VSPACE_TOP_3);
+		CssStyles.style(viewModeToggle, ValoTheme.OPTIONGROUP_HORIZONTAL, CssStyles.OPTIONGROUP_HORIZONTAL_PRIMARY, CssStyles.VSPACE_TOP_3);
 		viewModeToggle.addItems((Object[]) ViewMode.values());
 		viewModeToggle.setItemCaption(ViewMode.SIMPLE, I18nProperties.getEnumCaption(ViewMode.SIMPLE));
 		viewModeToggle.setItemCaption(ViewMode.NORMAL, I18nProperties.getEnumCaption(ViewMode.NORMAL));
 		// View mode toggle is hidden by default
 		viewModeToggle.setVisible(false);
-		addHeaderComponent(viewModeToggle);     
+		addHeaderComponent(viewModeToggle);
 
 		viewModeToggleListener = new ValueChangeListener() {
+
 			@Override
 			public void valueChange(ValueChangeEvent event) {
 				viewConfiguration.setViewMode((ViewMode) event.getProperty().getValue());
 				// refresh
 				ControllerProvider.getCaseController().navigateToCase(getCaseRef().getUuid());
 			}
-		};        
+		};
 		viewModeToggle.addValueChangeListener(viewModeToggleListener);
 	}
 
@@ -114,7 +115,7 @@ public abstract class AbstractCaseView extends AbstractSubNavigationView {
 			ControllerProvider.getCaseController().navigateToIndex();
 			return;
 		}
-		
+
 		CaseDataDto caze = FacadeProvider.getCaseFacade().getCaseDataByUuid(caseRef.getUuid());
 
 		// Handle outbreaks for the disease and district of the case
@@ -147,35 +148,53 @@ public abstract class AbstractCaseView extends AbstractSubNavigationView {
 		if (!hasOutbreak || !caze.getDisease().usesSimpleViewForOutbreaks() || viewConfiguration.getViewMode() != ViewMode.SIMPLE) {
 			menu.addView(CasePersonView.VIEW_NAME, I18nProperties.getPrefixCaption(CaseDataDto.I18N_PREFIX, CaseDataDto.PERSON), params);
 			if (caze.getDisease() == Disease.CONGENITAL_RUBELLA) {
-				menu.addView(MaternalHistoryView.VIEW_NAME, I18nProperties.getPrefixCaption(CaseDataDto.I18N_PREFIX, CaseDataDto.MATERNAL_HISTORY), params);
+				menu.addView(
+					MaternalHistoryView.VIEW_NAME,
+					I18nProperties.getPrefixCaption(CaseDataDto.I18N_PREFIX, CaseDataDto.MATERNAL_HISTORY),
+					params);
 			}
 			if (!caze.isUnreferredPortHealthCase() && !UserRole.isPortHealthUser(UserProvider.getCurrent().getUserRoles())) {
-				menu.addView(HospitalizationView.VIEW_NAME, I18nProperties.getPrefixCaption(CaseDataDto.I18N_PREFIX, CaseDataDto.HOSPITALIZATION), params);
+				menu.addView(
+					HospitalizationView.VIEW_NAME,
+					I18nProperties.getPrefixCaption(CaseDataDto.I18N_PREFIX, CaseDataDto.HOSPITALIZATION),
+					params);
 			}
 			if (caze.getCaseOrigin() == CaseOrigin.POINT_OF_ENTRY && UserProvider.getCurrent().hasUserRight(UserRight.PORT_HEALTH_INFO_VIEW)) {
-				menu.addView(PortHealthInfoView.VIEW_NAME, I18nProperties.getPrefixCaption(CaseDataDto.I18N_PREFIX, CaseDataDto.PORT_HEALTH_INFO), params);
+				menu.addView(
+					PortHealthInfoView.VIEW_NAME,
+					I18nProperties.getPrefixCaption(CaseDataDto.I18N_PREFIX, CaseDataDto.PORT_HEALTH_INFO),
+					params);
 			}
 			menu.addView(CaseSymptomsView.VIEW_NAME, I18nProperties.getPrefixCaption(CaseDataDto.I18N_PREFIX, CaseDataDto.SYMPTOMS), params);
 			if (caze.getDisease() != Disease.CONGENITAL_RUBELLA) {
 				menu.addView(EpiDataView.VIEW_NAME, I18nProperties.getPrefixCaption(CaseDataDto.I18N_PREFIX, CaseDataDto.EPI_DATA), params);
 			}
-			if (UserProvider.getCurrent().hasUserRight(UserRight.THERAPY_VIEW) && !caze.isUnreferredPortHealthCase() && !FacadeProvider.getFeatureConfigurationFacade().isFeatureDisabled(FeatureType.CLINICAL_MANAGEMENT)) {
+			if (UserProvider.getCurrent().hasUserRight(UserRight.THERAPY_VIEW)
+				&& !caze.isUnreferredPortHealthCase()
+				&& !FacadeProvider.getFeatureConfigurationFacade().isFeatureDisabled(FeatureType.CLINICAL_MANAGEMENT)) {
 				menu.addView(TherapyView.VIEW_NAME, I18nProperties.getPrefixCaption(CaseDataDto.I18N_PREFIX, CaseDataDto.THERAPY), params);
 			}
-			if (UserProvider.getCurrent().hasUserRight(UserRight.CLINICAL_COURSE_VIEW) && !caze.isUnreferredPortHealthCase() && !FacadeProvider.getFeatureConfigurationFacade().isFeatureDisabled(FeatureType.CLINICAL_MANAGEMENT)) {
-				menu.addView(ClinicalCourseView.VIEW_NAME, I18nProperties.getPrefixCaption(CaseDataDto.I18N_PREFIX, CaseDataDto.CLINICAL_COURSE), params);
+			if (UserProvider.getCurrent().hasUserRight(UserRight.CLINICAL_COURSE_VIEW)
+				&& !caze.isUnreferredPortHealthCase()
+				&& !FacadeProvider.getFeatureConfigurationFacade().isFeatureDisabled(FeatureType.CLINICAL_MANAGEMENT)) {
+				menu.addView(
+					ClinicalCourseView.VIEW_NAME,
+					I18nProperties.getPrefixCaption(CaseDataDto.I18N_PREFIX, CaseDataDto.CLINICAL_COURSE),
+					params);
 			}
 		}
-		if (FacadeProvider.getDiseaseConfigurationFacade().hasFollowUp(caze.getDisease()) && UserProvider.getCurrent().hasUserRight(UserRight.CONTACT_VIEW) &&
-				!caze.isUnreferredPortHealthCase()) {
+		if (FacadeProvider.getDiseaseConfigurationFacade().hasFollowUp(caze.getDisease())
+			&& UserProvider.getCurrent().hasUserRight(UserRight.CONTACT_VIEW)
+			&& !caze.isUnreferredPortHealthCase()) {
 			menu.addView(CaseContactsView.VIEW_NAME, I18nProperties.getPrefixCaption(CaseDataDto.I18N_PREFIX, Captions.caseContacts), params);
 		}
 
 		infoLabel.setValue(caseRef.getCaption());
 
-		infoLabelSub.setValue(caze.getDisease() != Disease.OTHER
+		infoLabelSub.setValue(
+			caze.getDisease() != Disease.OTHER
 				? DataHelper.toStringNullable(caze.getDisease())
-						: DataHelper.toStringNullable(caze.getDiseaseDetails()));
+				: DataHelper.toStringNullable(caze.getDiseaseDetails()));
 	}
 
 	@Override
@@ -205,7 +224,7 @@ public abstract class AbstractCaseView extends AbstractSubNavigationView {
 	@Override
 	protected void setSubComponent(Component newComponent) {
 		super.setSubComponent(newComponent);
-		
+
 		if (caseRef != null && FacadeProvider.getCaseFacade().isDeleted(caseRef.getUuid())) {
 			newComponent.setEnabled(false);
 		}
@@ -226,11 +245,11 @@ public abstract class AbstractCaseView extends AbstractSubNavigationView {
 
 		return viewConfiguration.getViewMode();
 	}
-	
+
 	public void setCaseEditPermission(Component component) {
-		Boolean isCaseEditAllowed  = FacadeProvider.getCaseFacade().isCaseEditAllowed(getCaseRef().getUuid());
-		if (!isCaseEditAllowed){
+		Boolean isCaseEditAllowed = FacadeProvider.getCaseFacade().isCaseEditAllowed(getCaseRef().getUuid());
+		if (!isCaseEditAllowed) {
 			component.setEnabled(false);
-    	}		
+		}
 	}
 }

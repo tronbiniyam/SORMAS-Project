@@ -9,11 +9,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *******************************************************************************/
 package de.symeda.sormas.ui.samples;
 
@@ -70,12 +70,11 @@ public class PathogenTestListEntry extends HorizontalLayout {
 			Label labelTopRight = new Label(VaadinIcons.CHECK_CIRCLE.getHtml(), ContentMode.HTML);
 			labelTopRight.setSizeUndefined();
 			labelTopRight.addStyleName(CssStyles.LABEL_LARGE);
-			labelTopRight.setDescription(I18nProperties.getPrefixCaption(PathogenTestDto.I18N_PREFIX,
-					PathogenTestDto.TEST_RESULT_VERIFIED));
+			labelTopRight.setDescription(I18nProperties.getPrefixCaption(PathogenTestDto.I18N_PREFIX, PathogenTestDto.TEST_RESULT_VERIFIED));
 			topLabelLayout.addComponent(labelTopRight);
 			topLabelLayout.setComponentAlignment(labelTopRight, Alignment.TOP_RIGHT);
 		}
-		
+
 		if (!DataHelper.isNullOrEmpty(pathogenTest.getTestResultText())) {
 			Label resultTextLabel = new Label(pathogenTest.getTestResultText());
 			labelLayout.addComponent(resultTextLabel);
@@ -86,7 +85,8 @@ public class PathogenTestListEntry extends HorizontalLayout {
 		middleLabelLayout.setMargin(false);
 		middleLabelLayout.setWidth(100, Unit.PERCENTAGE);
 		labelLayout.addComponent(middleLabelLayout);
-		Label labelLeft = new Label(DataHelper.toStringNullable(DiseaseHelper.toString(pathogenTest.getTestedDisease(), pathogenTest.getTestedDiseaseDetails())));
+		Label labelLeft =
+			new Label(DataHelper.toStringNullable(DiseaseHelper.toString(pathogenTest.getTestedDisease(), pathogenTest.getTestedDiseaseDetails())));
 		middleLabelLayout.addComponent(labelLeft);
 
 		Label labelRight = new Label(DateFormatHelper.formatLocalDateTime(pathogenTest.getTestDateTime()));
@@ -105,8 +105,13 @@ public class PathogenTestListEntry extends HorizontalLayout {
 
 	public void addEditListener(int rowIndex, ClickListener editClickListener) {
 		if (editButton == null) {
-			editButton = ButtonHelper.createIconButtonWithCaption("edit-test-" + rowIndex, null, VaadinIcons.PENCIL, null,
-					ValoTheme.BUTTON_LINK, CssStyles.BUTTON_COMPACT);
+			editButton = ButtonHelper.createIconButtonWithCaption(
+				"edit-test-" + rowIndex,
+				null,
+				VaadinIcons.PENCIL,
+				null,
+				ValoTheme.BUTTON_LINK,
+				CssStyles.BUTTON_COMPACT);
 
 			addComponent(editButton);
 			setComponentAlignment(editButton, Alignment.MIDDLE_RIGHT);

@@ -43,35 +43,72 @@ import de.symeda.sormas.ui.utils.AbstractEditForm;
 import de.symeda.sormas.ui.utils.FieldHelper;
 
 public class HealthConditionsForm extends AbstractEditForm<HealthConditionsDto> {
-		
-		private static final long serialVersionUID = 1L;
-		
-	
-	private static final String HTML_LAYOUT =
-			h3(I18nProperties.getString(Strings.headingHealthConditions)) +
-					fluidRow(
-							fluidColumn(6, 0, locs(
-									TUBERCULOSIS, ASPLENIA, HEPATITIS, DIABETES, IMMUNODEFICIENCY_OTHER_THAN_HIV, 
-									IMMUNODEFICIENCY_INCLUDING_HIV, HIV, HIV_ART, CONGENITAL_SYPHILIS, DOWN_SYNDROME, 
-									CHRONIC_LIVER_DISEASE, MALIGNANCY_CHEMOTHERAPY)),
-							fluidColumn(6, 0, locs(
-									CHRONIC_HEART_FAILURE, CHRONIC_PULMONARY_DISEASE, CHRONIC_KIDNEY_DISEASE,
-									CHRONIC_NEUROLOGIC_CONDITION, CARDIOVASCULAR_DISEASE_INCLUDING_HYPERTENSION,
-									OBESITY, CURRENT_SMOKER, FORMER_SMOKER, ASTHMA, SICKLE_CELL_DISEASE))
-					) +
-					loc(OTHER_CONDITIONS);
-	
+
+	private static final long serialVersionUID = 1L;
+
+	private static final String HTML_LAYOUT = h3(I18nProperties.getString(Strings.headingHealthConditions))
+		+ fluidRow(
+			fluidColumn(
+				6,
+				0,
+				locs(
+					TUBERCULOSIS,
+					ASPLENIA,
+					HEPATITIS,
+					DIABETES,
+					IMMUNODEFICIENCY_OTHER_THAN_HIV,
+					IMMUNODEFICIENCY_INCLUDING_HIV,
+					HIV,
+					HIV_ART,
+					CONGENITAL_SYPHILIS,
+					DOWN_SYNDROME,
+					CHRONIC_LIVER_DISEASE,
+					MALIGNANCY_CHEMOTHERAPY)),
+			fluidColumn(
+				6,
+				0,
+				locs(
+					CHRONIC_HEART_FAILURE,
+					CHRONIC_PULMONARY_DISEASE,
+					CHRONIC_KIDNEY_DISEASE,
+					CHRONIC_NEUROLOGIC_CONDITION,
+					CARDIOVASCULAR_DISEASE_INCLUDING_HYPERTENSION,
+					OBESITY,
+					CURRENT_SMOKER,
+					FORMER_SMOKER,
+					ASTHMA,
+					SICKLE_CELL_DISEASE)))
+		+ loc(OTHER_CONDITIONS);
+
 	public HealthConditionsForm() {
 		super(HealthConditionsDto.class, I18N_PREFIX);
 	}
-	
+
 	@Override
 	protected void addFields() {
-		addFields(TUBERCULOSIS, ASPLENIA, HEPATITIS, DIABETES, HIV, HIV_ART, CHRONIC_LIVER_DISEASE,
-				MALIGNANCY_CHEMOTHERAPY, CHRONIC_HEART_FAILURE, CHRONIC_PULMONARY_DISEASE,
-				CHRONIC_KIDNEY_DISEASE, CHRONIC_NEUROLOGIC_CONDITION, DOWN_SYNDROME, CONGENITAL_SYPHILIS,
-				IMMUNODEFICIENCY_OTHER_THAN_HIV, CARDIOVASCULAR_DISEASE_INCLUDING_HYPERTENSION, OBESITY,
-				CURRENT_SMOKER, FORMER_SMOKER, ASTHMA, SICKLE_CELL_DISEASE, IMMUNODEFICIENCY_INCLUDING_HIV);
+		addFields(
+			TUBERCULOSIS,
+			ASPLENIA,
+			HEPATITIS,
+			DIABETES,
+			HIV,
+			HIV_ART,
+			CHRONIC_LIVER_DISEASE,
+			MALIGNANCY_CHEMOTHERAPY,
+			CHRONIC_HEART_FAILURE,
+			CHRONIC_PULMONARY_DISEASE,
+			CHRONIC_KIDNEY_DISEASE,
+			CHRONIC_NEUROLOGIC_CONDITION,
+			DOWN_SYNDROME,
+			CONGENITAL_SYPHILIS,
+			IMMUNODEFICIENCY_OTHER_THAN_HIV,
+			CARDIOVASCULAR_DISEASE_INCLUDING_HYPERTENSION,
+			OBESITY,
+			CURRENT_SMOKER,
+			FORMER_SMOKER,
+			ASTHMA,
+			SICKLE_CELL_DISEASE,
+			IMMUNODEFICIENCY_INCLUDING_HIV);
 		addField(OTHER_CONDITIONS, TextArea.class).setRows(3);
 
 		for (Object propertyId : getFieldGroup().getBoundPropertyIds()) {
@@ -80,13 +117,13 @@ public class HealthConditionsForm extends AbstractEditForm<HealthConditionsDto> 
 				field.setVisible(false);
 			}
 		}
-		
+
 		FieldHelper.setVisibleWhen(getFieldGroup(), HIV_ART, HIV, Arrays.asList(YesNoUnknown.YES), true);
 	}
-    
+
 	@Override
 	protected String createHtmlLayout() {
-		 return HTML_LAYOUT;
+		return HTML_LAYOUT;
 	}
 
 }

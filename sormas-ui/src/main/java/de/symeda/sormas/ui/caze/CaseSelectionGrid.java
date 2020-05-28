@@ -40,14 +40,24 @@ public class CaseSelectionGrid extends Grid {
 		GeneratedPropertyContainer generatedContainer = new GeneratedPropertyContainer(container);
 		setContainerDataSource(generatedContainer);
 
-		setColumns(CaseIndexDto.UUID, CaseIndexDto.EPID_NUMBER, CaseIndexDto.EXTERNAL_ID, CaseIndexDto.PERSON_FIRST_NAME, CaseIndexDto.PERSON_LAST_NAME,
-				CaseIndexDto.AGE_AND_BIRTH_DATE, CaseIndexDto.DISTRICT_NAME, CaseIndexDto.HEALTH_FACILITY_NAME, CaseIndexDto.REPORT_DATE,
-				CaseIndexDto.SEX, CaseIndexDto.CASE_CLASSIFICATION, CaseIndexDto.OUTCOME);
+		setColumns(
+			CaseIndexDto.UUID,
+			CaseIndexDto.EPID_NUMBER,
+			CaseIndexDto.EXTERNAL_ID,
+			CaseIndexDto.PERSON_FIRST_NAME,
+			CaseIndexDto.PERSON_LAST_NAME,
+			CaseIndexDto.AGE_AND_BIRTH_DATE,
+			CaseIndexDto.DISTRICT_NAME,
+			CaseIndexDto.HEALTH_FACILITY_NAME,
+			CaseIndexDto.REPORT_DATE,
+			CaseIndexDto.SEX,
+			CaseIndexDto.CASE_CLASSIFICATION,
+			CaseIndexDto.OUTCOME);
 
 		if (FacadeProvider.getConfigFacade().isGermanServer()) {
 			getColumn(CaseIndexDto.EPID_NUMBER).setHidden(true);
 		} else {
-			getColumn(CaseIndexDto.EXTERNAL_ID).setHidden(true);			
+			getColumn(CaseIndexDto.EXTERNAL_ID).setHidden(true);
 		}
 
 		getColumn(CaseIndexDto.UUID).setRenderer(new V7UuidRenderer());
@@ -55,8 +65,8 @@ public class CaseSelectionGrid extends Grid {
 		getColumn(CaseIndexDto.REPORT_DATE).setRenderer(new DateRenderer(DateHelper.getLocalDateTimeFormat(I18nProperties.getUserLanguage())));
 
 		for (Column column : getColumns()) {
-			column.setHeaderCaption(I18nProperties.getPrefixCaption(
-					CaseIndexDto.I18N_PREFIX, column.getPropertyId().toString(), column.getHeaderCaption()));
+			column.setHeaderCaption(
+				I18nProperties.getPrefixCaption(CaseIndexDto.I18N_PREFIX, column.getPropertyId().toString(), column.getHeaderCaption()));
 		}
 	}
 

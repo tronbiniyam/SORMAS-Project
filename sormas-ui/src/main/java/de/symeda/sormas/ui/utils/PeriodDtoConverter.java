@@ -1,9 +1,10 @@
 package de.symeda.sormas.ui.utils;
 
-import com.vaadin.v7.data.util.converter.Converter;
-import de.symeda.sormas.api.therapy.PeriodDto;
-
 import java.util.Locale;
+
+import com.vaadin.v7.data.util.converter.Converter;
+
+import de.symeda.sormas.api.therapy.PeriodDto;
 
 public class PeriodDtoConverter implements Converter<String, PeriodDto> {
 

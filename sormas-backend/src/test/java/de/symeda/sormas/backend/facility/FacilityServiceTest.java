@@ -9,11 +9,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *******************************************************************************/
 package de.symeda.sormas.backend.facility;
 
@@ -57,7 +57,7 @@ public class FacilityServiceTest extends AbstractBeanTest {
 		Community community = creator.createCommunity("Community", district);
 		Community otherCommunity = creator.createCommunity("Other Community", otherDistrict);
 		creator.createFacility("Facility", region, district, community);
-		
+
 		assertThat(getFacilityService().getHealthFacilitiesByName("Facility", district, community, true), hasSize(1));
 		assertThat(getFacilityService().getHealthFacilitiesByName(" Facility ", district, community, true), hasSize(1));
 		assertThat(getFacilityService().getHealthFacilitiesByName("facility", district, null, true), hasSize(1));
@@ -72,7 +72,7 @@ public class FacilityServiceTest extends AbstractBeanTest {
 		District district = creator.createDistrict("District", region);
 		Community community = creator.createCommunity("Community", district);
 		creator.createFacility("Laboratory", FacilityType.LABORATORY, region, district, community);
-		
+
 		assertThat(getFacilityService().getLaboratoriesByName("Laboratory", true), hasSize(1));
 		assertThat(getFacilityService().getLaboratoriesByName(" Laboratory ", true), hasSize(1));
 		assertThat(getFacilityService().getLaboratoriesByName("laboratory", true), hasSize(1));

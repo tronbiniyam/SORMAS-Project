@@ -9,11 +9,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *******************************************************************************/
 package de.symeda.sormas.ui.caze;
 
@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import de.symeda.sormas.ui.utils.ButtonHelper;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.exception.CloneFailedException;
 import org.slf4j.Logger;
@@ -36,8 +35,6 @@ import org.slf4j.LoggerFactory;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -56,6 +53,7 @@ import com.vaadin.v7.ui.Table;
 import com.vaadin.v7.ui.Table.ColumnGenerator;
 
 import de.symeda.sormas.api.i18n.Captions;
+import de.symeda.sormas.ui.utils.ButtonHelper;
 import de.symeda.sormas.ui.utils.CssStyles;
 
 /**
@@ -66,8 +64,8 @@ import de.symeda.sormas.ui.utils.CssStyles;
  * @author Martin Wahnschaffe
  */
 @SuppressWarnings({
-		"serial",
-		"rawtypes"})
+	"serial",
+	"rawtypes" })
 public abstract class AbstractTableField<E> extends CustomField<Collection> {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -103,6 +101,7 @@ public abstract class AbstractTableField<E> extends CustomField<Collection> {
 	 * and do not need to be scrolled vertically (<= 10 entries)
 	 * (and expandRatio is used?), A horizontal scroll bar appears.
 	 * This can be corrected in CSS as follows:
+	 * 
 	 * <pre>
 	 * .v-table-scrollbarFix .v-table-body-wrapper,
 	 * .v-table-scrollbarFix .v-table-body-wrapper:focus {
@@ -155,13 +154,13 @@ public abstract class AbstractTableField<E> extends CustomField<Collection> {
 
 		table = createTable();
 		table.addItemSetChangeListener(new ItemSetChangeListener() {
+
 			@Override
 			public void containerItemSetChange(ItemSetChangeEvent event) {
 				applyTablePageLength();
 			}
 		});
 		layout.addComponent(table);
-
 
 		return layout;
 	}
@@ -278,7 +277,8 @@ public abstract class AbstractTableField<E> extends CustomField<Collection> {
 	/**
 	 * Copy of an entry. All editing is then done within this copy. At commit, this entry replaces the old one.
 	 *
-	 * @param sourceEntry original
+	 * @param sourceEntry
+	 *            original
 	 * @return
 	 */
 	protected E cloneEntry(E sourceEntry) {
@@ -554,11 +554,10 @@ public abstract class AbstractTableField<E> extends CustomField<Collection> {
 		return true;
 	}
 
-
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void setValue(Collection newFieldValue, boolean repaintIsNotNeeded, boolean ignoreReadOnly)
-			throws com.vaadin.v7.data.Property.ReadOnlyException, ConversionException, InvalidValueException {
+		throws com.vaadin.v7.data.Property.ReadOnlyException, ConversionException, InvalidValueException {
 
 		BeanItemContainer<E> container = getContainer();
 		if (container == null) {
@@ -574,7 +573,7 @@ public abstract class AbstractTableField<E> extends CustomField<Collection> {
 
 	/**
 	 * @since Vaadin 7.4
-	 * Workaround, because in AbstractField.clear () calls setValue (null).
+	 *        Workaround, because in AbstractField.clear () calls setValue (null).
 	 */
 	public void clear() {
 		BeanItemContainer<E> container = getContainer();

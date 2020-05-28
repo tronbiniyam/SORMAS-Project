@@ -13,7 +13,6 @@ import de.symeda.sormas.api.caze.CaseDataDto;
 import de.symeda.sormas.api.i18n.Captions;
 import de.symeda.sormas.api.i18n.I18nProperties;
 import de.symeda.sormas.ui.utils.ButtonHelper;
-import de.symeda.sormas.ui.utils.CssStyles;
 
 @SuppressWarnings("serial")
 public class LineListingAddDiseaseLayout extends HorizontalLayout {

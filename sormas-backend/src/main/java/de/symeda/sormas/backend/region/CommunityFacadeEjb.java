@@ -9,11 +9,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *******************************************************************************/
 package de.symeda.sormas.backend.region;
 
@@ -70,10 +70,7 @@ public class CommunityFacadeEjb implements CommunityFacade {
 	public List<CommunityReferenceDto> getAllActiveByDistrict(String districtUuid) {
 		District district = districtService.getByUuid(districtUuid);
 
-		return district.getCommunities().stream()
-				.filter(c -> !c.isArchived())
-				.map(f -> toReferenceDto(f))
-				.collect(Collectors.toList());
+		return district.getCommunities().stream().filter(c -> !c.isArchived()).map(f -> toReferenceDto(f)).collect(Collectors.toList());
 	}
 
 	@Override
@@ -112,14 +109,21 @@ public class CommunityFacadeEjb implements CommunityFacade {
 		Join<Community, District> district = root.join(Community.DISTRICT, JoinType.LEFT);
 		Join<District, Region> region = district.join(District.REGION, JoinType.LEFT);
 
-		cq.multiselect(root.get(Community.CREATION_DATE), root.get(Community.CHANGE_DATE), root.get(Community.UUID), root.get(Community.ARCHIVED),
-				root.get(Community.NAME), region.get(Region.UUID), region.get(Region.NAME), district.get(District.UUID),
-				district.get(District.NAME), root.get(Community.EXTERNAL_ID));
+		cq.multiselect(
+			root.get(Community.CREATION_DATE),
+			root.get(Community.CHANGE_DATE),
+			root.get(Community.UUID),
+			root.get(Community.ARCHIVED),
+			root.get(Community.NAME),
+			region.get(Region.UUID),
+			region.get(Region.NAME),
+			district.get(District.UUID),
+			district.get(District.NAME),
+			root.get(Community.EXTERNAL_ID));
 	}
 
 	@Override
-	public List<CommunityDto> getIndexList(CommunityCriteria criteria, Integer first, Integer max,
-			List<SortProperty> sortProperties) {
+	public List<CommunityDto> getIndexList(CommunityCriteria criteria, Integer first, Integer max, List<SortProperty> sortProperties) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Community> cq = cb.createQuery(Community.class);
 		Root<Community> community = cq.from(Community.class);
@@ -154,8 +158,7 @@ public class CommunityFacadeEjb implements CommunityFacade {
 			}
 			cq.orderBy(order);
 		} else {
-			cq.orderBy(cb.asc(region.get(Region.NAME)), cb.asc(district.get(District.NAME)),
-					cb.asc(community.get(Community.NAME)));
+			cq.orderBy(cb.asc(region.get(Region.NAME)), cb.asc(district.get(District.NAME)), cb.asc(community.get(Community.NAME)));
 		}
 
 		cq.select(community);
@@ -166,7 +169,13 @@ public class CommunityFacadeEjb implements CommunityFacade {
 		//				district.get(District.UUID), district.get(District.NAME));
 
 		if (first != null && max != null) {
-			return em.createQuery(cq).setFirstResult(first).setMaxResults(max).getResultList().stream().map(f -> toDto(f)).collect(Collectors.toList());
+			return em.createQuery(cq)
+				.setFirstResult(first)
+				.setMaxResults(max)
+				.getResultList()
+				.stream()
+				.map(f -> toDto(f))
+				.collect(Collectors.toList());
 		} else {
 			return em.createQuery(cq).getResultList().stream().map(f -> toDto(f)).collect(Collectors.toList());
 		}
@@ -215,7 +224,7 @@ public class CommunityFacadeEjb implements CommunityFacade {
 	@Override
 	public void saveCommunity(CommunityDto dto) throws ValidationRuntimeException {
 		Community community = communityService.getByUuid(dto.getUuid());
-		
+
 		if (community == null && !getByName(dto.getName(), dto.getDistrict(), true).isEmpty()) {
 			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importCommunityAlreadyExists));
 		}
@@ -230,8 +239,10 @@ public class CommunityFacadeEjb implements CommunityFacade {
 
 	@Override
 	public List<CommunityReferenceDto> getByName(String name, DistrictReferenceDto districtRef, boolean includeArchivedEntities) {
-		return communityService.getByName(name, districtService.getByReferenceDto(districtRef), includeArchivedEntities).stream()
-				.map(c -> toReferenceDto(c)).collect(Collectors.toList());
+		return communityService.getByName(name, districtService.getByReferenceDto(districtRef), includeArchivedEntities)
+			.stream()
+			.map(c -> toReferenceDto(c))
+			.collect(Collectors.toList());
 	}
 
 	@Override
@@ -248,14 +259,9 @@ public class CommunityFacadeEjb implements CommunityFacade {
 		Join<District, Region> regionJoin = districtJoin.join(District.REGION);
 
 		cq.where(
-				cb.and(
-						cb.or(
-								cb.isTrue(districtJoin.get(District.ARCHIVED)),
-								cb.isTrue(regionJoin.get(Region.ARCHIVED))
-								),
-						root.get(Community.UUID).in(communityUuids)
-						)
-				);
+			cb.and(
+				cb.or(cb.isTrue(districtJoin.get(District.ARCHIVED)), cb.isTrue(regionJoin.get(Region.ARCHIVED))),
+				root.get(Community.UUID).in(communityUuids)));
 
 		cq.select(root.get(Community.ID));
 
