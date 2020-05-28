@@ -29,10 +29,11 @@ import com.vaadin.v7.shared.ui.grid.HeightMode;
 import de.symeda.sormas.api.disease.DiseaseBurdenDto;
 import de.symeda.sormas.api.i18n.Captions;
 import de.symeda.sormas.api.i18n.I18nProperties;
-// import de.symeda.sormas.ui.CurrentUser;
 import de.symeda.sormas.ui.dashboard.DashboardDataProvider;
 import de.symeda.sormas.ui.dashboard.DiseaseBurdenGrid;
 import de.symeda.sormas.ui.utils.CssStyles;
+
+// import de.symeda.sormas.ui.CurrentUser;
 
 public class DiseaseBurdenComponent extends VerticalLayout {
 

@@ -30,6 +30,7 @@ public enum StatisticsVisualizationType {
 	};
 
 	public enum StatisticsVisualizationMapType {
+
 		REGIONS,
 		DISTRICTS;
 
@@ -39,6 +40,7 @@ public enum StatisticsVisualizationType {
 	}
 
 	public enum StatisticsVisualizationChartType {
+
 		COLUMN,
 		STACKED_COLUMN,
 		LINE,

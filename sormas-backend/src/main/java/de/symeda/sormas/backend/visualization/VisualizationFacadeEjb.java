@@ -137,6 +137,7 @@ public class VisualizationFacadeEjb implements VisualizationFacade {
 	}
 
 	enum EnvParam {
+
 		DB_USER("user"),
 		DB_PASS("password"),
 		DB_NAME("databaseName"),
