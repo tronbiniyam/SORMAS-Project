@@ -28,39 +28,33 @@ import de.symeda.sormas.ui.utils.DateTimeField;
 import de.symeda.sormas.ui.utils.FieldHelper;
 
 public class PortHealthInfoForm extends AbstractEditForm<PortHealthInfoDto> {
-	
+
 	private static final long serialVersionUID = 1L;
-	
-	private static final String POINT_OF_ENTRY_LAYOUT_HTML = 
-			h3(I18nProperties.getString(Strings.headingPointOfEntryInformation)) +
-			fluidRowLocs(PointOfEntryDto.POINT_OF_ENTRY_TYPE, CaseDataDto.POINT_OF_ENTRY);
-	
-	private static final String HTML_LAYOUT_AIRPORT =
-			POINT_OF_ENTRY_LAYOUT_HTML +
-			fluidRowLocs(PortHealthInfoDto.AIRLINE_NAME, PortHealthInfoDto.FLIGHT_NUMBER) +
-			fluidRowLocs(PortHealthInfoDto.DEPARTURE_AIRPORT, PortHealthInfoDto.DEPARTURE_DATE_TIME) +
-			fluidRowLocs(PortHealthInfoDto.FREE_SEATING, PortHealthInfoDto.SEAT_NUMBER) +
-			fluidRowLocs(PortHealthInfoDto.ARRIVAL_DATE_TIME, PortHealthInfoDto.NUMBER_OF_TRANSIT_STOPS) +
-			loc(PortHealthInfoDto.TRANSIT_STOP_DETAILS_1) +
-			loc(PortHealthInfoDto.TRANSIT_STOP_DETAILS_2) +
-			loc(PortHealthInfoDto.TRANSIT_STOP_DETAILS_3) +
-			loc(PortHealthInfoDto.TRANSIT_STOP_DETAILS_4) +
-			loc(PortHealthInfoDto.TRANSIT_STOP_DETAILS_5);
 
-	private static final String HTML_LAYOUT_SEAPORT =
-			POINT_OF_ENTRY_LAYOUT_HTML +
-			fluidRowLocs(PortHealthInfoDto.VESSEL_NAME, PortHealthInfoDto.VESSEL_DETAILS) +
-			fluidRowLocs(PortHealthInfoDto.PORT_OF_DEPARTURE, PortHealthInfoDto.LAST_PORT_OF_CALL) +
-			fluidRowLocs(PortHealthInfoDto.DEPARTURE_DATE_TIME, PortHealthInfoDto.ARRIVAL_DATE_TIME);
+	private static final String POINT_OF_ENTRY_LAYOUT_HTML = h3(I18nProperties.getString(Strings.headingPointOfEntryInformation))
+		+ fluidRowLocs(PointOfEntryDto.POINT_OF_ENTRY_TYPE, CaseDataDto.POINT_OF_ENTRY);
 
-	private static final String HTML_LAYOUT_GROUND_CROSSING =
-			POINT_OF_ENTRY_LAYOUT_HTML +
-			fluidRowLocs(PortHealthInfoDto.CONVEYANCE_TYPE, PortHealthInfoDto.CONVEYANCE_TYPE_DETAILS) +
-			fluidRowLocs(PortHealthInfoDto.DEPARTURE_LOCATION, PortHealthInfoDto.FINAL_DESTINATION);
+	private static final String HTML_LAYOUT_AIRPORT = POINT_OF_ENTRY_LAYOUT_HTML
+		+ fluidRowLocs(PortHealthInfoDto.AIRLINE_NAME, PortHealthInfoDto.FLIGHT_NUMBER)
+		+ fluidRowLocs(PortHealthInfoDto.DEPARTURE_AIRPORT, PortHealthInfoDto.DEPARTURE_DATE_TIME)
+		+ fluidRowLocs(PortHealthInfoDto.FREE_SEATING, PortHealthInfoDto.SEAT_NUMBER)
+		+ fluidRowLocs(PortHealthInfoDto.ARRIVAL_DATE_TIME, PortHealthInfoDto.NUMBER_OF_TRANSIT_STOPS)
+		+ loc(PortHealthInfoDto.TRANSIT_STOP_DETAILS_1)
+		+ loc(PortHealthInfoDto.TRANSIT_STOP_DETAILS_2)
+		+ loc(PortHealthInfoDto.TRANSIT_STOP_DETAILS_3)
+		+ loc(PortHealthInfoDto.TRANSIT_STOP_DETAILS_4)
+		+ loc(PortHealthInfoDto.TRANSIT_STOP_DETAILS_5);
 
-	private static final String HTML_LAYOUT_OTHER =
-			POINT_OF_ENTRY_LAYOUT_HTML +
-			loc(PortHealthInfoDto.DETAILS);
+	private static final String HTML_LAYOUT_SEAPORT = POINT_OF_ENTRY_LAYOUT_HTML
+		+ fluidRowLocs(PortHealthInfoDto.VESSEL_NAME, PortHealthInfoDto.VESSEL_DETAILS)
+		+ fluidRowLocs(PortHealthInfoDto.PORT_OF_DEPARTURE, PortHealthInfoDto.LAST_PORT_OF_CALL)
+		+ fluidRowLocs(PortHealthInfoDto.DEPARTURE_DATE_TIME, PortHealthInfoDto.ARRIVAL_DATE_TIME);
+
+	private static final String HTML_LAYOUT_GROUND_CROSSING = POINT_OF_ENTRY_LAYOUT_HTML
+		+ fluidRowLocs(PortHealthInfoDto.CONVEYANCE_TYPE, PortHealthInfoDto.CONVEYANCE_TYPE_DETAILS)
+		+ fluidRowLocs(PortHealthInfoDto.DEPARTURE_LOCATION, PortHealthInfoDto.FINAL_DESTINATION);
+
+	private static final String HTML_LAYOUT_OTHER = POINT_OF_ENTRY_LAYOUT_HTML + loc(PortHealthInfoDto.DETAILS);
 
 	private PointOfEntryDto pointOfEntry;
 	private String pointOfEntryDetails;
@@ -69,7 +63,7 @@ public class PortHealthInfoForm extends AbstractEditForm<PortHealthInfoDto> {
 		super(PortHealthInfoDto.class, PortHealthInfoDto.I18N_PREFIX);
 		this.pointOfEntry = pointOfEntry;
 		this.pointOfEntryDetails = pointOfEntryDetails;
-		
+
 		addFields();
 	}
 
@@ -105,40 +99,97 @@ public class PortHealthInfoForm extends AbstractEditForm<PortHealthInfoDto> {
 	}
 
 	private void addAirportFields() {
-		addFields(PortHealthInfoDto.AIRLINE_NAME, PortHealthInfoDto.FLIGHT_NUMBER, PortHealthInfoDto.DEPARTURE_AIRPORT, PortHealthInfoDto.SEAT_NUMBER,
-				PortHealthInfoDto.TRANSIT_STOP_DETAILS_1, PortHealthInfoDto.TRANSIT_STOP_DETAILS_2, PortHealthInfoDto.TRANSIT_STOP_DETAILS_3,
-				PortHealthInfoDto.TRANSIT_STOP_DETAILS_4, PortHealthInfoDto.TRANSIT_STOP_DETAILS_5);
+		addFields(
+			PortHealthInfoDto.AIRLINE_NAME,
+			PortHealthInfoDto.FLIGHT_NUMBER,
+			PortHealthInfoDto.DEPARTURE_AIRPORT,
+			PortHealthInfoDto.SEAT_NUMBER,
+			PortHealthInfoDto.TRANSIT_STOP_DETAILS_1,
+			PortHealthInfoDto.TRANSIT_STOP_DETAILS_2,
+			PortHealthInfoDto.TRANSIT_STOP_DETAILS_3,
+			PortHealthInfoDto.TRANSIT_STOP_DETAILS_4,
+			PortHealthInfoDto.TRANSIT_STOP_DETAILS_5);
 		DateTimeField dfDepartureDateTime = addField(PortHealthInfoDto.DEPARTURE_DATE_TIME, DateTimeField.class);
 		DateTimeField dfArrivalDateTime = addField(PortHealthInfoDto.ARRIVAL_DATE_TIME, DateTimeField.class);
 		addField(PortHealthInfoDto.FREE_SEATING, OptionGroup.class);
 		ComboBox cbNumberOfTransitStops = addField(PortHealthInfoDto.NUMBER_OF_TRANSIT_STOPS, ComboBox.class);
-		
+
 		cbNumberOfTransitStops.addItems(DataHelper.buildIntegerList(0, 5));
-		
+
 		// Visibility
-		FieldHelper.setVisibleWhen(getFieldGroup(), PortHealthInfoDto.TRANSIT_STOP_DETAILS_1, PortHealthInfoDto.NUMBER_OF_TRANSIT_STOPS, Arrays.asList(1, 2, 3, 4, 5), true);
-		FieldHelper.setVisibleWhen(getFieldGroup(), PortHealthInfoDto.TRANSIT_STOP_DETAILS_2, PortHealthInfoDto.NUMBER_OF_TRANSIT_STOPS, Arrays.asList(2, 3, 4, 5), true);
-		FieldHelper.setVisibleWhen(getFieldGroup(), PortHealthInfoDto.TRANSIT_STOP_DETAILS_3, PortHealthInfoDto.NUMBER_OF_TRANSIT_STOPS, Arrays.asList(3, 4, 5), true);
-		FieldHelper.setVisibleWhen(getFieldGroup(), PortHealthInfoDto.TRANSIT_STOP_DETAILS_4, PortHealthInfoDto.NUMBER_OF_TRANSIT_STOPS, Arrays.asList(4, 5), true);
-		FieldHelper.setVisibleWhen(getFieldGroup(), PortHealthInfoDto.TRANSIT_STOP_DETAILS_5, PortHealthInfoDto.NUMBER_OF_TRANSIT_STOPS, Arrays.asList(5), true);
-		FieldHelper.setVisibleWhen(getFieldGroup(), PortHealthInfoDto.SEAT_NUMBER, PortHealthInfoDto.FREE_SEATING, Arrays.asList(YesNoUnknown.NO), true);
-		
+		FieldHelper.setVisibleWhen(
+			getFieldGroup(),
+			PortHealthInfoDto.TRANSIT_STOP_DETAILS_1,
+			PortHealthInfoDto.NUMBER_OF_TRANSIT_STOPS,
+			Arrays.asList(1, 2, 3, 4, 5),
+			true);
+		FieldHelper.setVisibleWhen(
+			getFieldGroup(),
+			PortHealthInfoDto.TRANSIT_STOP_DETAILS_2,
+			PortHealthInfoDto.NUMBER_OF_TRANSIT_STOPS,
+			Arrays.asList(2, 3, 4, 5),
+			true);
+		FieldHelper.setVisibleWhen(
+			getFieldGroup(),
+			PortHealthInfoDto.TRANSIT_STOP_DETAILS_3,
+			PortHealthInfoDto.NUMBER_OF_TRANSIT_STOPS,
+			Arrays.asList(3, 4, 5),
+			true);
+		FieldHelper.setVisibleWhen(
+			getFieldGroup(),
+			PortHealthInfoDto.TRANSIT_STOP_DETAILS_4,
+			PortHealthInfoDto.NUMBER_OF_TRANSIT_STOPS,
+			Arrays.asList(4, 5),
+			true);
+		FieldHelper.setVisibleWhen(
+			getFieldGroup(),
+			PortHealthInfoDto.TRANSIT_STOP_DETAILS_5,
+			PortHealthInfoDto.NUMBER_OF_TRANSIT_STOPS,
+			Arrays.asList(5),
+			true);
+		FieldHelper
+			.setVisibleWhen(getFieldGroup(), PortHealthInfoDto.SEAT_NUMBER, PortHealthInfoDto.FREE_SEATING, Arrays.asList(YesNoUnknown.NO), true);
+
 		// Validations
-		dfDepartureDateTime.addValidator(new DateComparisonValidator(dfDepartureDateTime, dfArrivalDateTime, true, false,
+		dfDepartureDateTime.addValidator(
+			new DateComparisonValidator(
+				dfDepartureDateTime,
+				dfArrivalDateTime,
+				true,
+				false,
 				I18nProperties.getValidationError(Validations.beforeDate, dfDepartureDateTime.getCaption(), dfArrivalDateTime.getCaption())));
-		dfArrivalDateTime.addValidator(new DateComparisonValidator(dfArrivalDateTime, dfDepartureDateTime, false, false, 
+		dfArrivalDateTime.addValidator(
+			new DateComparisonValidator(
+				dfArrivalDateTime,
+				dfDepartureDateTime,
+				false,
+				false,
 				I18nProperties.getValidationError(Validations.afterDate, dfArrivalDateTime.getCaption(), dfDepartureDateTime.getCaption())));
 	}
 
 	private void addSeaportFields() {
-		addFields(PortHealthInfoDto.VESSEL_NAME, PortHealthInfoDto.VESSEL_DETAILS, PortHealthInfoDto.PORT_OF_DEPARTURE, PortHealthInfoDto.LAST_PORT_OF_CALL);
+		addFields(
+			PortHealthInfoDto.VESSEL_NAME,
+			PortHealthInfoDto.VESSEL_DETAILS,
+			PortHealthInfoDto.PORT_OF_DEPARTURE,
+			PortHealthInfoDto.LAST_PORT_OF_CALL);
 		DateTimeField dfDepartureDateTime = addField(PortHealthInfoDto.DEPARTURE_DATE_TIME, DateTimeField.class);
 		DateTimeField dfArrivalDateTime = addField(PortHealthInfoDto.ARRIVAL_DATE_TIME, DateTimeField.class);
 
 		// Validations
-		dfDepartureDateTime.addValidator(new DateComparisonValidator(dfDepartureDateTime, dfArrivalDateTime, true, false,
+		dfDepartureDateTime.addValidator(
+			new DateComparisonValidator(
+				dfDepartureDateTime,
+				dfArrivalDateTime,
+				true,
+				false,
 				I18nProperties.getValidationError(Validations.beforeDate, dfDepartureDateTime.getCaption(), dfArrivalDateTime.getCaption())));
-		dfArrivalDateTime.addValidator(new DateComparisonValidator(dfArrivalDateTime, dfDepartureDateTime, false, false, 
+		dfArrivalDateTime.addValidator(
+			new DateComparisonValidator(
+				dfArrivalDateTime,
+				dfDepartureDateTime,
+				false,
+				false,
 				I18nProperties.getValidationError(Validations.afterDate, dfArrivalDateTime.getCaption(), dfDepartureDateTime.getCaption())));
 	}
 
@@ -147,7 +198,12 @@ public class PortHealthInfoForm extends AbstractEditForm<PortHealthInfoDto> {
 		addField(PortHealthInfoDto.CONVEYANCE_TYPE, ComboBox.class);
 
 		// Visibility
-		FieldHelper.setVisibleWhen(getFieldGroup(), PortHealthInfoDto.CONVEYANCE_TYPE_DETAILS, PortHealthInfoDto.CONVEYANCE_TYPE, Arrays.asList(ConveyanceType.OTHER), true);
+		FieldHelper.setVisibleWhen(
+			getFieldGroup(),
+			PortHealthInfoDto.CONVEYANCE_TYPE_DETAILS,
+			PortHealthInfoDto.CONVEYANCE_TYPE,
+			Arrays.asList(ConveyanceType.OTHER),
+			true);
 	}
 
 	private void addOtherFields() {

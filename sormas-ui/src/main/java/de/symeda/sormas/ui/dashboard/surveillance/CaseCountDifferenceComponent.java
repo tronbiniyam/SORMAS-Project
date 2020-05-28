@@ -9,11 +9,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *******************************************************************************/
 package de.symeda.sormas.ui.dashboard.surveillance;
 
@@ -68,16 +68,17 @@ public class CaseCountDifferenceComponent extends VerticalLayout {
 
 	public void refresh(int limitDiseasesCount) {
 		List<DiseaseBurdenDto> diseasesBurden = dashboardDataProvider.getDiseasesBurden();
-		
-		Stream<DiseaseBurdenDto> diseasesBurdenStream = diseasesBurden.stream()
-									   .sorted((dto1, dto2) -> {
-										   long caseDifference1 = dto1.getCasesDifference();
-										   long caseDifference2 = dto2.getCasesDifference();
-										   if (caseDifference1 == 0) caseDifference1 = Long.MIN_VALUE;
-										   if (caseDifference2 == 0) caseDifference2 = Long.MIN_VALUE;
-										   return Long.compare(caseDifference2, caseDifference1);
-									   });
-									   
+
+		Stream<DiseaseBurdenDto> diseasesBurdenStream = diseasesBurden.stream().sorted((dto1, dto2) -> {
+			long caseDifference1 = dto1.getCasesDifference();
+			long caseDifference2 = dto2.getCasesDifference();
+			if (caseDifference1 == 0)
+				caseDifference1 = Long.MIN_VALUE;
+			if (caseDifference2 == 0)
+				caseDifference2 = Long.MIN_VALUE;
+			return Long.compare(caseDifference2, caseDifference1);
+		});
+
 		if (limitDiseasesCount > 0) {
 			diseasesBurdenStream = diseasesBurdenStream.limit(limitDiseasesCount);
 		}
@@ -91,71 +92,43 @@ public class CaseCountDifferenceComponent extends VerticalLayout {
 		}
 	}
 
-	private void refreshChart(List<DiseaseBurdenDto> data) {	
+	private void refreshChart(List<DiseaseBurdenDto> data) {
 		int maxCasesDifference = data.stream().map(d -> Math.abs(d.getCasesDifference())).max(Long::compare).orElse(5L).intValue();
 		maxCasesDifference = Math.max(5, maxCasesDifference);
-		
+
 		StringBuilder hcjs = new StringBuilder();
-		
-		hcjs.append(
-			"var options = {" + 
-				"plotOptions: {" + 
-					"bar: {" + 
-						"colorByPoint: true," +
-						"groupPadding: 0.05" + 
-					"}" + 
-				"}," + 
-				 
-				"chart: {" + 
-					"type: 'bar'," + 
-					"styledMode: true," + 
-				"}," + 
-					
-				"series: [" +
-					"{" +
-						"name: ''," + 
-						"data: [" +
-							data.stream().map((d) -> 
-							"{" +
-								"y: " + d.getCasesDifference() + "," +
-								"className: '" + CssStyles.getDiseaseColor(d.getDisease()) + " " + CssStyles.BACKGROUND_DARKER + "'," +
-							"},")
-							.reduce((fullText, nextText) -> fullText + nextText).orElse("") + 
-						"]," +
-					"}" +
-				"]," +
-					
-				"xAxis: {" +
-					"categories: [" + 
-						data.stream().map((d) -> "'" + d.getDisease().toString() + "'").reduce((fullText, nextText) -> fullText + ", " + nextText).orElse("") + 
-					"]" +
-				"}," + 
-					
-				"yAxis: {" + 
-					"title: { text: '" + I18nProperties.getCaption(Captions.dashboardDiseaseDifferenceYAxisLabel) + "' }," + 
-					"allowDecimals: false," + 
-					"max: " + maxCasesDifference + "," + 
-					"min: " + -maxCasesDifference + "," + 
-				"}," + 
-					
-				"tooltip: { " + 
-					"headerFormat: '<b>{point.x}: </b>{point.y}<br/>'," + 
-					"pointFormat: ' '" + 
-				"}," + 
-				
-				"title: { text: '' }, " + 
-				"legend: { enabled: false }," + 
-				"credits: { enabled: false }," + 
-				"exporting: { enabled: false }," + 
-				"" + 
-			"}"
-		);
+
+		hcjs.append("var options = {" + "plotOptions: {" + "bar: {" + "colorByPoint: true," + "groupPadding: 0.05" + "}" + "}," +
+
+			"chart: {" + "type: 'bar'," + "styledMode: true," + "}," +
+
+			"series: [" + "{" + "name: ''," + "data: ["
+			+ data.stream()
+				.map(
+					(d) -> "{" + "y: " + d.getCasesDifference() + "," + "className: '" + CssStyles.getDiseaseColor(d.getDisease()) + " "
+						+ CssStyles.BACKGROUND_DARKER + "'," + "},")
+				.reduce((fullText, nextText) -> fullText + nextText)
+				.orElse("")
+			+ "]," + "}" + "]," +
+
+			"xAxis: {" + "categories: ["
+			+ data.stream().map((d) -> "'" + d.getDisease().toString() + "'").reduce((fullText, nextText) -> fullText + ", " + nextText).orElse("")
+			+ "]" + "}," +
+
+			"yAxis: {" + "title: { text: '" + I18nProperties.getCaption(Captions.dashboardDiseaseDifferenceYAxisLabel) + "' },"
+			+ "allowDecimals: false," + "max: " + maxCasesDifference + "," + "min: " + -maxCasesDifference + "," + "}," +
+
+			"tooltip: { " + "headerFormat: '<b>{point.x}: </b>{point.y}<br/>'," + "pointFormat: ' '" + "}," +
+
+			"title: { text: '' }, " + "legend: { enabled: false }," + "credits: { enabled: false }," + "exporting: { enabled: false }," + "" + "}");
 
 		chart.setHcjs(hcjs.toString());
 	}
-	
+
 	public void updateSubHeader() {
-		subtitleLabel.setValue(String.format(I18nProperties.getCaption(Captions.dashboardComparedToPreviousPeriod),
+		subtitleLabel.setValue(
+			String.format(
+				I18nProperties.getCaption(Captions.dashboardComparedToPreviousPeriod),
 				DateFormatHelper.buildPeriodString(dashboardDataProvider.getFromDate(), dashboardDataProvider.getToDate()),
 				DateFormatHelper.buildPeriodString(dashboardDataProvider.getPreviousFromDate(), dashboardDataProvider.getPreviousToDate())));
 	}

@@ -72,9 +72,13 @@ public class LineListingConfigurationView extends AbstractConfigurationView {
 
 		Label infoTextLabel;
 		if (region != null) {
-			infoTextLabel = new Label(VaadinIcons.INFO_CIRCLE.getHtml() + " " + I18nProperties.getString(Strings.infoLineListingConfigurationRegion), ContentMode.HTML);
+			infoTextLabel = new Label(
+				VaadinIcons.INFO_CIRCLE.getHtml() + " " + I18nProperties.getString(Strings.infoLineListingConfigurationRegion),
+				ContentMode.HTML);
 		} else {
-			infoTextLabel = new Label(VaadinIcons.INFO_CIRCLE.getHtml() + " " + I18nProperties.getString(Strings.infoLineListingConfigurationNation), ContentMode.HTML);
+			infoTextLabel = new Label(
+				VaadinIcons.INFO_CIRCLE.getHtml() + " " + I18nProperties.getString(Strings.infoLineListingConfigurationNation),
+				ContentMode.HTML);
 		}
 		CssStyles.style(infoTextLabel, CssStyles.LABEL_MEDIUM);
 		contentLayout.addComponent(infoTextLabel);
@@ -89,8 +93,8 @@ public class LineListingConfigurationView extends AbstractConfigurationView {
 		// Retrieve existing line listing configurations from the database
 		List<Disease> diseasesWithoutConfigurations = FacadeProvider.getDiseaseConfigurationFacade().getAllDiseases(true, true, true);
 
-		List<FeatureConfigurationIndexDto> lineListingConfigurations = FacadeProvider.getFeatureConfigurationFacade().getFeatureConfigurations(
-				new FeatureConfigurationCriteria().featureType(FeatureType.LINE_LISTING).region(region), false);
+		List<FeatureConfigurationIndexDto> lineListingConfigurations = FacadeProvider.getFeatureConfigurationFacade()
+			.getFeatureConfigurations(new FeatureConfigurationCriteria().featureType(FeatureType.LINE_LISTING).region(region), false);
 
 		for (FeatureConfigurationIndexDto configuration : lineListingConfigurations) {
 			if (!configurationMap.containsKey(configuration.getDisease())) {
@@ -104,7 +108,7 @@ public class LineListingConfigurationView extends AbstractConfigurationView {
 		configurationMap.keySet().stream().forEach(disease -> {
 			lineListingConfigurationsLayout.addComponent(createDiseaseConfigurationLayout(disease, configurationMap.get(disease)));
 		});
-		
+
 		if (enteredDisease != null && !configurationMap.containsKey(enteredDisease)) {
 			lineListingConfigurationsLayout.addComponent(createDiseaseConfigurationLayout(enteredDisease, null));
 		}
@@ -125,18 +129,24 @@ public class LineListingConfigurationView extends AbstractConfigurationView {
 	}
 
 	private void showConfirmDisableAllWindow(HorizontalLayout diseaseAndDistrictLayout, Disease disease) {
-		VaadinUiUtil.showConfirmationPopup(I18nProperties.getString(Strings.headingDisableLineListing), new Label(
-				I18nProperties.getString(region != null ? Strings.confirmationDisableAllLineListingRegion : Strings.confirmationDisableAllLineListingNational)),
-				I18nProperties.getCaption(Captions.actionConfirm), I18nProperties.getCaption(Captions.actionCancel), 
-				480, result -> {
-					if (Boolean.TRUE.equals(result)) {
-						FeatureConfigurationCriteria criteria = new FeatureConfigurationCriteria().disease(disease).region(region).featureType(FeatureType.LINE_LISTING);
-						FacadeProvider.getFeatureConfigurationFacade().deleteAllFeatureConfigurations(criteria);
-						lineListingConfigurationsLayout.removeComponent(diseaseAndDistrictLayout);
-						addDiseaseLayout.addDiseaseToList(disease);
-						Notification.show(null, I18nProperties.getString(Strings.messageLineListingDisabled), Type.TRAY_NOTIFICATION);
-					}
-				});
+		VaadinUiUtil.showConfirmationPopup(
+			I18nProperties.getString(Strings.headingDisableLineListing),
+			new Label(
+				I18nProperties
+					.getString(region != null ? Strings.confirmationDisableAllLineListingRegion : Strings.confirmationDisableAllLineListingNational)),
+			I18nProperties.getCaption(Captions.actionConfirm),
+			I18nProperties.getCaption(Captions.actionCancel),
+			480,
+			result -> {
+				if (Boolean.TRUE.equals(result)) {
+					FeatureConfigurationCriteria criteria =
+						new FeatureConfigurationCriteria().disease(disease).region(region).featureType(FeatureType.LINE_LISTING);
+					FacadeProvider.getFeatureConfigurationFacade().deleteAllFeatureConfigurations(criteria);
+					lineListingConfigurationsLayout.removeComponent(diseaseAndDistrictLayout);
+					addDiseaseLayout.addDiseaseToList(disease);
+					Notification.show(null, I18nProperties.getString(Strings.messageLineListingDisabled), Type.TRAY_NOTIFICATION);
+				}
+			});
 	}
 
 	private HorizontalLayout createDiseaseConfigurationLayout(Disease disease, List<FeatureConfigurationIndexDto> configurations) {
@@ -205,9 +215,12 @@ public class LineListingConfigurationView extends AbstractConfigurationView {
 	private void openEditWindow(Disease disease) {
 		Window editWindow = VaadinUiUtil.createPopupWindow();
 
-		FeatureConfigurationCriteria criteria = new FeatureConfigurationCriteria().disease(disease).region(region).featureType(FeatureType.LINE_LISTING);
+		FeatureConfigurationCriteria criteria =
+			new FeatureConfigurationCriteria().disease(disease).region(region).featureType(FeatureType.LINE_LISTING);
 		LineListingConfigurationEditLayout editLayout = new LineListingConfigurationEditLayout(
-				FacadeProvider.getFeatureConfigurationFacade().getFeatureConfigurations(criteria, true), disease, region != null ? region.toString() : null);
+			FacadeProvider.getFeatureConfigurationFacade().getFeatureConfigurations(criteria, true),
+			disease,
+			region != null ? region.toString() : null);
 
 		editLayout.setSaveCallback(() -> {
 			Notification.show(null, I18nProperties.getString(Strings.messageLineListingSaved), Type.TRAY_NOTIFICATION);

@@ -52,17 +52,17 @@ public class InfrastructureFacadeEjb implements InfrastructureFacade {
 	protected FeatureConfigurationFacadeEjbLocal featureConfigurationFacade;
 	@EJB
 	protected UserService userService;
-	
+
 	@Override
 	public InfrastructureSyncDto getInfrastructureSyncData(InfrastructureChangeDatesDto changeDates) {
 		InfrastructureSyncDto sync = new InfrastructureSyncDto();
-		
+
 		if (facilityService.countAfter(changeDates.getFacilityChangeDate()) > configFacade.getInfrastructureSyncThreshold()
-				|| communityService.countAfter(changeDates.getCommunityChangeDate()) > configFacade.getInfrastructureSyncThreshold()) {
+			|| communityService.countAfter(changeDates.getCommunityChangeDate()) > configFacade.getInfrastructureSyncThreshold()) {
 			sync.setInitialSyncRequired(true);
 			return sync;
 		}
-		
+
 		sync.setRegions(regionFacade.getAllAfter(changeDates.getRegionChangeDate()));
 		sync.setDistricts(districtFacade.getAllAfter(changeDates.getDistrictChangeDate()));
 		sync.setCommunities(communityFacade.getAllAfter(changeDates.getCommunityChangeDate()));
@@ -75,8 +75,8 @@ public class InfrastructureFacadeEjb implements InfrastructureFacade {
 		sync.setDeletedUserRoleConfigurationUuids(userRoleConfigurationFacade.getDeletedUuids(changeDates.getUserRoleConfigurationChangeDate()));
 		sync.setFeatureConfigurations(featureConfigurationFacade.getAllAfter(changeDates.getFeatureConfigurationChangeDate()));
 		sync.setDeletedFeatureConfigurationUuids(featureConfigurationFacade.getDeletedUuids(changeDates.getFeatureConfigurationChangeDate()));
-		
+
 		return sync;
 	}
-	
+
 }

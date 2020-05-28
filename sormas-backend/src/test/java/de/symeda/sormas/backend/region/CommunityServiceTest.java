@@ -1,8 +1,8 @@
 package de.symeda.sormas.backend.region;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
 
 import org.junit.Test;
 
@@ -16,7 +16,7 @@ public class CommunityServiceTest extends AbstractBeanTest {
 		District district = creator.createDistrict("District", region);
 		District otherDistrict = creator.createDistrict("Other District", region);
 		creator.createCommunity("Community", district);
-		
+
 		assertThat(getCommunityService().getByName("Community", district, true), hasSize(1));
 		assertThat(getCommunityService().getByName(" Community ", district, true), hasSize(1));
 		assertThat(getCommunityService().getByName("community", district, true), hasSize(1));

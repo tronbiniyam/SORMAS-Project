@@ -24,7 +24,7 @@ public class AdditionalTestService extends AbstractAdoService<AdditionalTest> {
 
 	@EJB
 	private SampleService sampleService;
-	
+
 	public AdditionalTestService() {
 		super(AdditionalTest.class);
 	}
@@ -74,12 +74,12 @@ public class AdditionalTestService extends AbstractAdoService<AdditionalTest> {
 
 		return em.createQuery(cq).getResultList();
 	}
-	
+
 	public List<AdditionalTest> getAllBySample(Sample sample) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<AdditionalTest> cq = cb.createQuery(getElementClass());
 		Root<AdditionalTest> from = cq.from(getElementClass());
-		
+
 		if (sample != null) {
 			cq.where(cb.equal(from.get(AdditionalTest.SAMPLE), sample));
 		}
@@ -88,7 +88,7 @@ public class AdditionalTestService extends AbstractAdoService<AdditionalTest> {
 		List<AdditionalTest> resultList = em.createQuery(cq).getResultList();
 		return resultList;
 	}
-	
+
 	/**
 	 * @see /sormas-backend/doc/UserDataAccess.md
 	 */
@@ -101,5 +101,5 @@ public class AdditionalTestService extends AbstractAdoService<AdditionalTest> {
 
 		return filter;
 	}
-	
+
 }

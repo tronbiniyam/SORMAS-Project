@@ -1,14 +1,16 @@
 package de.symeda.sormas.backend.util;
 
-import de.symeda.sormas.backend.common.AbstractDomainObject;
+import java.util.function.Consumer;
 
 import javax.persistence.criteria.From;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Root;
-import java.util.function.Consumer;
+
+import de.symeda.sormas.backend.common.AbstractDomainObject;
 
 public class AbstractDomainObjectJoins<ADO extends AbstractDomainObject> {
+
 	private Root<ADO> root;
 
 	public AbstractDomainObjectJoins(Root<ADO> root) {
@@ -19,7 +21,7 @@ public class AbstractDomainObjectJoins<ADO extends AbstractDomainObject> {
 		return root;
 	}
 
-	protected  <T> Join<ADO, T> getOrCreate(Join<ADO, T> join, String attribute, JoinType joinType, Consumer<Join<ADO, T>> setValue) {
+	protected <T> Join<ADO, T> getOrCreate(Join<ADO, T> join, String attribute, JoinType joinType, Consumer<Join<ADO, T>> setValue) {
 		return getOrCreate(join, attribute, joinType, root, setValue);
 	}
 

@@ -20,19 +20,18 @@ public class PointOfEntryForm extends AbstractEditForm<PointOfEntryDto> {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final String HTML_LAYOUT = 
-			fluidRowLocs(PointOfEntryDto.NAME, PointOfEntryDto.POINT_OF_ENTRY_TYPE) +
-			fluidRowLocs(PointOfEntryDto.REGION, PointOfEntryDto.DISTRICT) +
-			fluidRowLocs(PointOfEntryDto.LATITUDE, PointOfEntryDto.LONGITUDE) +
-			fluidRowLocs(RegionDto.EXTERNAL_ID) +
-			fluidRowLocs(PointOfEntryDto.ACTIVE, "");
-	
+	private static final String HTML_LAYOUT = fluidRowLocs(PointOfEntryDto.NAME, PointOfEntryDto.POINT_OF_ENTRY_TYPE)
+		+ fluidRowLocs(PointOfEntryDto.REGION, PointOfEntryDto.DISTRICT)
+		+ fluidRowLocs(PointOfEntryDto.LATITUDE, PointOfEntryDto.LONGITUDE)
+		+ fluidRowLocs(RegionDto.EXTERNAL_ID)
+		+ fluidRowLocs(PointOfEntryDto.ACTIVE, "");
+
 	private boolean create;
-	
+
 	public PointOfEntryForm(boolean create) {
 		super(PointOfEntryDto.class, PointOfEntryDto.I18N_PREFIX, false);
 		this.create = create;
-		
+
 		setWidth(540, Unit.PIXELS);
 
 		if (create) {
@@ -40,7 +39,7 @@ public class PointOfEntryForm extends AbstractEditForm<PointOfEntryDto> {
 		}
 		addFields();
 	}
-	
+
 	@Override
 	protected void addFields() {
 		addField(PointOfEntryDto.NAME, TextField.class);
@@ -59,11 +58,11 @@ public class PointOfEntryForm extends AbstractEditForm<PointOfEntryDto> {
 
 		cbRegion.addValueChangeListener(e -> {
 			RegionReferenceDto regionDto = (RegionReferenceDto) e.getProperty().getValue();
-			FieldHelper.updateItems(cbDistrict,
-					regionDto != null ? FacadeProvider.getDistrictFacade().getAllActiveByRegion(regionDto.getUuid()) : null);
+			FieldHelper
+				.updateItems(cbDistrict, regionDto != null ? FacadeProvider.getDistrictFacade().getAllActiveByRegion(regionDto.getUuid()) : null);
 		});
 		cbRegion.addItems(FacadeProvider.getRegionFacade().getAllActiveAsReference());
-		
+
 		setRequired(true, PointOfEntryDto.NAME, PointOfEntryDto.POINT_OF_ENTRY_TYPE);
 		if (!create) {
 			cbRegion.setEnabled(false);

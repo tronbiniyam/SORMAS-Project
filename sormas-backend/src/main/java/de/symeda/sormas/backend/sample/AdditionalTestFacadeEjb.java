@@ -26,41 +26,39 @@ public class AdditionalTestFacadeEjb implements AdditionalTestFacade {
 
 	@PersistenceContext(unitName = ModelConstants.PERSISTENCE_UNIT_NAME)
 	private EntityManager em;
-	
+
 	@EJB
 	private AdditionalTestService service;
 	@EJB
 	private SampleService sampleService;
 	@EJB
 	private UserService userService;
-	
+
 	@Override
 	public AdditionalTestDto getByUuid(String uuid) {
 		return toDto(service.getByUuid(uuid));
 	}
-	
+
 	@Override
 	public List<AdditionalTestDto> getAllBySample(String sampleUuid) {
 		if (sampleUuid == null) {
 			return Collections.emptyList();
 		}
-		
+
 		Sample sample = sampleService.getByUuid(sampleUuid);
-		
-		return service.getAllBySample(sample).stream()
-				.map(s -> toDto(s))
-				.collect(Collectors.toList());
+
+		return service.getAllBySample(sample).stream().map(s -> toDto(s)).collect(Collectors.toList());
 	}
-	
+
 	@Override
 	public AdditionalTestDto saveAdditionalTest(AdditionalTestDto additionalTest) {
 		AdditionalTest entity = fromDto(additionalTest);
-		
+
 		service.ensurePersisted(entity);
-		
+
 		return toDto(entity);
 	}
-	
+
 	@Override
 	public void deleteAdditionalTest(String additionalTestUuid) {
 		User user = userService.getCurrentUser();
@@ -68,32 +66,27 @@ public class AdditionalTestFacadeEjb implements AdditionalTestFacade {
 		if (!user.getUserRoles().contains(UserRole.ADMIN)) {
 			throw new UnsupportedOperationException("Only admins are allowed to delete entities");
 		}
-		
+
 		AdditionalTest additionalTest = service.getByUuid(additionalTestUuid);
 		service.delete(additionalTest);
-	}	
+	}
 
 	@Override
 	public List<AdditionalTestDto> getAllActiveAdditionalTestsAfter(Date date) {
 		User user = userService.getCurrentUser();
 
-		if(user == null) {
+		if (user == null) {
 			return Collections.emptyList();
 		}
 
-		return service.getAllActiveAdditionalTestsAfter(date, user).stream()
-				.map(e -> toDto(e))
-				.collect(Collectors.toList());
+		return service.getAllActiveAdditionalTestsAfter(date, user).stream().map(e -> toDto(e)).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<AdditionalTestDto> getByUuids(List<String> uuids) {
-		return service.getByUuids(uuids)
-				.stream()
-				.map(c -> toDto(c))
-				.collect(Collectors.toList());
+		return service.getByUuids(uuids).stream().map(c -> toDto(c)).collect(Collectors.toList());
 	}
-	
+
 	@Override
 	public List<String> getAllActiveUuids() {
 		User user = userService.getCurrentUser();
@@ -103,8 +96,8 @@ public class AdditionalTestFacadeEjb implements AdditionalTestFacade {
 		}
 
 		return service.getAllActiveUuids(user);
-	}	
-	
+	}
+
 	public AdditionalTest fromDto(@NotNull AdditionalTestDto source) {
 		AdditionalTest target = service.getByUuid(source.getUuid());
 		if (target == null) {
@@ -114,9 +107,9 @@ public class AdditionalTestFacadeEjb implements AdditionalTestFacade {
 				target.setCreationDate(new Timestamp(source.getCreationDate().getTime()));
 			}
 		}
-		
+
 		DtoHelper.validateDto(source, target);
-		
+
 		target.setSample(sampleService.getByReferenceDto(source.getSample()));
 		target.setTestDateTime(source.getTestDateTime());
 		target.setHaemoglobinuria(source.getHaemoglobinuria());
@@ -139,15 +132,15 @@ public class AdditionalTestFacadeEjb implements AdditionalTestFacade {
 		target.setPlatelets(source.getPlatelets());
 		target.setProthrombinTime(source.getPlatelets());
 		target.setOtherTestResults(source.getOtherTestResults());
-		
+
 		return target;
 	}
-	
+
 	public AdditionalTestDto toDto(AdditionalTest source) {
 		if (source == null) {
 			return null;
 		}
-		
+
 		AdditionalTestDto target = new AdditionalTestDto();
 		DtoHelper.fillDto(target, source);
 
@@ -173,7 +166,7 @@ public class AdditionalTestFacadeEjb implements AdditionalTestFacade {
 		target.setPlatelets(source.getPlatelets());
 		target.setProthrombinTime(source.getPlatelets());
 		target.setOtherTestResults(source.getOtherTestResults());
-		
+
 		return target;
 	}
 
@@ -181,5 +174,5 @@ public class AdditionalTestFacadeEjb implements AdditionalTestFacade {
 	@Stateless
 	public static class AdditionalTestFacadeEjbLocal extends AdditionalTestFacadeEjb {
 	}
-	
+
 }

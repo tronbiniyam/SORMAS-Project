@@ -9,11 +9,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *******************************************************************************/
 package de.symeda.sormas.backend.region;
 
@@ -69,12 +69,10 @@ public class RegionFacadeEjb implements RegionFacade {
 	private CommunityService communityService;
 	@EJB
 	private PopulationDataFacadeEjbLocal populationDataFacade;
-	
+
 	@Override
 	public List<RegionReferenceDto> getAllActiveAsReference() {
-		return regionService.getAllActive(Region.NAME, true).stream()
-				.map(f -> toReferenceDto(f))
-				.collect(Collectors.toList());
+		return regionService.getAllActive(Region.NAME, true).stream().map(f -> toReferenceDto(f)).collect(Collectors.toList());
 	}
 
 	@Override
@@ -96,14 +94,19 @@ public class RegionFacadeEjb implements RegionFacade {
 
 	// Need to be in the same order as in the constructor
 	private void selectDtoFields(CriteriaQuery<RegionDto> cq, Root<Region> root) {
-		cq.multiselect(root.get(Region.CREATION_DATE), root.get(Region.CHANGE_DATE), root.get(Region.UUID), root.get(Region.ARCHIVED),
-				root.get(Region.NAME), root.get(Region.EPID_CODE), root.get(Region.GROWTH_RATE),
-				root.get(Region.EXTERNAL_ID));
+		cq.multiselect(
+			root.get(Region.CREATION_DATE),
+			root.get(Region.CHANGE_DATE),
+			root.get(Region.UUID),
+			root.get(Region.ARCHIVED),
+			root.get(Region.NAME),
+			root.get(Region.EPID_CODE),
+			root.get(Region.GROWTH_RATE),
+			root.get(Region.EXTERNAL_ID));
 	}
 
 	@Override
-	public List<RegionIndexDto> getIndexList(RegionCriteria criteria, Integer first, Integer max,
-			List<SortProperty> sortProperties) {
+	public List<RegionIndexDto> getIndexList(RegionCriteria criteria, Integer first, Integer max, List<SortProperty> sortProperties) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Region> cq = cb.createQuery(Region.class);
 		Root<Region> region = cq.from(Region.class);
@@ -138,7 +141,13 @@ public class RegionFacadeEjb implements RegionFacade {
 		cq.select(region);
 
 		if (first != null && max != null) {
-			return em.createQuery(cq).setFirstResult(first).setMaxResults(max).getResultList().stream().map(f -> toIndexDto(f)).collect(Collectors.toList());
+			return em.createQuery(cq)
+				.setFirstResult(first)
+				.setMaxResults(max)
+				.getResultList()
+				.stream()
+				.map(f -> toIndexDto(f))
+				.collect(Collectors.toList());
 		} else {
 			return em.createQuery(cq).getResultList().stream().map(f -> toIndexDto(f)).collect(Collectors.toList());
 		}
@@ -194,34 +203,34 @@ public class RegionFacadeEjb implements RegionFacade {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<String> cq = cb.createQuery(String.class);
 		Root<Region> root = cq.from(Region.class);
-		
+
 		Predicate filter = root.get(Region.ID).in(regionIds);
 		cq.where(filter);
 		cq.select(root.get(Region.NAME));
 		return em.createQuery(cq).getResultList();
 	}
-	
+
 	@Override
 	public void archive(String regionUuid) {
 		Region region = regionService.getByUuid(regionUuid);
 		region.setArchived(true);
 		regionService.ensurePersisted(region);
 	}
-	
+
 	@Override
 	public void dearchive(String regionUuid) {
 		Region region = regionService.getByUuid(regionUuid);
 		region.setArchived(false);
 		regionService.ensurePersisted(region);
 	}
-	
+
 	@Override
 	public boolean isUsedInOtherInfrastructureData(Collection<String> regionUuids) {
-		return regionService.isUsedInInfrastructureData(regionUuids, District.REGION, District.class) ||
-				regionService.isUsedInInfrastructureData(regionUuids, Facility.REGION, Facility.class) ||
-				regionService.isUsedInInfrastructureData(regionUuids, PointOfEntry.REGION, PointOfEntry.class);
+		return regionService.isUsedInInfrastructureData(regionUuids, District.REGION, District.class)
+			|| regionService.isUsedInInfrastructureData(regionUuids, Facility.REGION, Facility.class)
+			|| regionService.isUsedInInfrastructureData(regionUuids, PointOfEntry.REGION, PointOfEntry.class);
 	}
-	
+
 	public static RegionReferenceDto toReferenceDto(Region entity) {
 		if (entity == null) {
 			return null;
@@ -265,11 +274,11 @@ public class RegionFacadeEjb implements RegionFacade {
 	@Override
 	public void saveRegion(RegionDto dto) throws ValidationRuntimeException {
 		Region region = regionService.getByUuid(dto.getUuid());
-		
+
 		if (region == null && !regionService.getByName(dto.getName(), true).isEmpty()) {
 			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importRegionAlreadyExists));
 		}
-		
+
 		region = fillOrBuildEntity(dto, region);
 		regionService.ensurePersisted(region);
 	}

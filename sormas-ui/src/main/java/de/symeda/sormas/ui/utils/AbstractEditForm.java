@@ -9,11 +9,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *******************************************************************************/
 package de.symeda.sormas.ui.utils;
 
@@ -142,8 +142,8 @@ public abstract class AbstractEditForm<DTO extends EntityDto> extends AbstractFo
 		} catch (CommitException e) {
 			if (e.getInvalidFields().size() > 0) {
 				throw new InvalidValueException(
-						e.getInvalidFields().keySet().stream().map(f -> f.getCaption()).collect(Collectors.joining(", ")),
-						e.getInvalidFields().values().stream().toArray(InvalidValueException[]::new));
+					e.getInvalidFields().keySet().stream().map(f -> f.getCaption()).collect(Collectors.joining(", ")),
+					e.getInvalidFields().values().stream().toArray(InvalidValueException[]::new));
 			} else {
 				throw new SourceException(this, e);
 			}
@@ -196,15 +196,18 @@ public abstract class AbstractEditForm<DTO extends EntityDto> extends AbstractFo
 		return field;
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({
+		"unchecked",
+		"rawtypes" })
 	@Override
 	protected <T extends Field> T addField(String propertyId) {
 		return (T) addField(propertyId, Field.class);
 	}
 
 	/**
-	 * @param allowedDaysInFuture How many days in the future the value of this field can be or
-	 * -1 for no restriction at all
+	 * @param allowedDaysInFuture
+	 *            How many days in the future the value of this field can be or
+	 *            -1 for no restriction at all
 	 */
 	@SuppressWarnings("rawtypes")
 	@Override
@@ -228,8 +231,7 @@ public abstract class AbstractEditForm<DTO extends EntityDto> extends AbstractFo
 
 		if (field instanceof AbstractField) {
 			AbstractField<?> abstractField = (AbstractField) field;
-			abstractField.setDescription(I18nProperties.getPrefixDescription(
-					propertyI18nPrefix, propertyId, abstractField.getDescription()));
+			abstractField.setDescription(I18nProperties.getPrefixDescription(propertyI18nPrefix, propertyId, abstractField.getDescription()));
 
 			if (hideValidationUntilNextCommit && !abstractField.isInvalidCommitted()) {
 				abstractField.setValidationVisible(false);
@@ -318,7 +320,7 @@ public abstract class AbstractEditForm<DTO extends EntityDto> extends AbstractFo
 		}
 	}
 
-	protected boolean areFieldsValid(String... propertyIds){
+	protected boolean areFieldsValid(String... propertyIds) {
 		return Stream.of(propertyIds).allMatch(p -> getField(p).isValid());
 	}
 
@@ -364,10 +366,13 @@ public abstract class AbstractEditForm<DTO extends EntityDto> extends AbstractFo
 
 	/**
 	 * Sets the initial visibilities based on annotations and builds a list of all fields in a form that are allowed to be visible -
-	 * this is either because the @Diseases and @Outbreaks annotations are not relevant or at least one of these annotations are present on the respective field.
+	 * this is either because the @Diseases and @Outbreaks annotations are not relevant or at least one of these annotations are present on
+	 * the respective field.
 	 *
-	 * @param disease  Not null if the @Diseases annotation should be taken into account
-	 * @param viewMode Not null if the @Outbreaks annotation should be taken into account
+	 * @param disease
+	 *            Not null if the @Diseases annotation should be taken into account
+	 * @param viewMode
+	 *            Not null if the @Outbreaks annotation should be taken into account
 	 */
 	protected void initializeVisibilitiesAndAllowedVisibilities(Disease disease, ViewMode viewMode) {
 		for (Object propertyId : getFieldGroup().getBoundPropertyIds()) {
@@ -382,8 +387,7 @@ public abstract class AbstractEditForm<DTO extends EntityDto> extends AbstractFo
 				diseaseVisibility = false;
 			}
 
-			boolean outbreakVisibility = viewMode != ViewMode.SIMPLE || 
-					Outbreaks.OutbreaksConfiguration.isDefined(getType(), (String) propertyId);
+			boolean outbreakVisibility = viewMode != ViewMode.SIMPLE || Outbreaks.OutbreaksConfiguration.isDefined(getType(), (String) propertyId);
 
 			if (diseaseVisibility && outbreakVisibility) {
 				visibleAllowedFields.add(field);
@@ -396,19 +400,17 @@ public abstract class AbstractEditForm<DTO extends EntityDto> extends AbstractFo
 	protected boolean isFieldHiddenForCurrentCountry(Object propertyId) {
 		try {
 			final java.lang.reflect.Field declaredField = getType().getDeclaredField(propertyId.toString());
-			
+
 			final String countryLocale = FacadeProvider.getConfigFacade().getCountryLocale();
-			
+
 			final Predicate<String> currentCountryIsHiddenForField = countryLocale::startsWith;
 
-			if (declaredField.isAnnotationPresent(HideForCountries.class) &&
-					Arrays.stream(declaredField.getAnnotation(HideForCountries.class).countries())
-					.anyMatch(currentCountryIsHiddenForField)) {
+			if (declaredField.isAnnotationPresent(HideForCountries.class)
+				&& Arrays.stream(declaredField.getAnnotation(HideForCountries.class).countries()).anyMatch(currentCountryIsHiddenForField)) {
 				return true;
 			}
-			if (declaredField.isAnnotationPresent(HideForCountriesExcept.class) &&
-					Arrays.stream(declaredField.getAnnotation(HideForCountriesExcept.class).countries())
-					.noneMatch(currentCountryIsHiddenForField)) {
+			if (declaredField.isAnnotationPresent(HideForCountriesExcept.class)
+				&& Arrays.stream(declaredField.getAnnotation(HideForCountriesExcept.class).countries()).noneMatch(currentCountryIsHiddenForField)) {
 				return true;
 			}
 		} catch (NoSuchFieldException e) {

@@ -9,11 +9,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *******************************************************************************/
 package de.symeda.sormas.backend.facility;
 
@@ -101,12 +101,10 @@ public class FacilityService extends AbstractInfrastructureAdoService<Facility> 
 		Root<Facility> from = cq.from(getElementClass());
 
 		cq.where(
-				cb.and(
-						createBasicFilter(cb, from),
-						cb.equal(from.get(Facility.TYPE), FacilityType.LABORATORY),
-						cb.notEqual(from.get(Facility.UUID), FacilityDto.OTHER_LABORATORY_UUID)
-						)
-				);
+			cb.and(
+				createBasicFilter(cb, from),
+				cb.equal(from.get(Facility.TYPE), FacilityType.LABORATORY),
+				cb.notEqual(from.get(Facility.UUID), FacilityDto.OTHER_LABORATORY_UUID)));
 		cq.orderBy(cb.asc(from.get(Facility.NAME)));
 
 		List<Facility> facilities = em.createQuery(cq).getResultList();
@@ -124,13 +122,11 @@ public class FacilityService extends AbstractInfrastructureAdoService<Facility> 
 		Root<Facility> from = cq.from(getElementClass());
 
 		Predicate filter = cb.or(
-				cb.equal(cb.trim(from.get(Facility.NAME)), name.trim()),
-				cb.equal(cb.lower(cb.trim(from.get(Facility.NAME))), name.trim().toLowerCase())
-				);
+			cb.equal(cb.trim(from.get(Facility.NAME)), name.trim()),
+			cb.equal(cb.lower(cb.trim(from.get(Facility.NAME))), name.trim().toLowerCase()));
 		// Additional null check is required because notEqual returns true if one of the
 		// values is null
-		filter = cb.and(filter, cb.or(cb.isNull(from.get(Facility.TYPE)),
-				cb.notEqual(from.get(Facility.TYPE), FacilityType.LABORATORY)));
+		filter = cb.and(filter, cb.or(cb.isNull(from.get(Facility.TYPE)), cb.notEqual(from.get(Facility.TYPE), FacilityType.LABORATORY)));
 		if (!includeArchivedEntities) {
 			filter = cb.and(filter, createBasicFilter(cb, from));
 		}
@@ -155,9 +151,8 @@ public class FacilityService extends AbstractInfrastructureAdoService<Facility> 
 		Root<Facility> from = cq.from(getElementClass());
 
 		Predicate filter = cb.or(
-				cb.equal(cb.trim(from.get(Facility.NAME)), name.trim()),
-				cb.equal(cb.lower(cb.trim(from.get(Facility.NAME))), name.trim().toLowerCase())
-				);
+			cb.equal(cb.trim(from.get(Facility.NAME)), name.trim()),
+			cb.equal(cb.lower(cb.trim(from.get(Facility.NAME))), name.trim().toLowerCase()));
 		filter = cb.and(filter, cb.equal(from.get(Facility.TYPE), FacilityType.LABORATORY));
 		if (!includeArchivedEntities) {
 			filter = cb.and(filter, createBasicFilter(cb, from));
@@ -175,26 +170,26 @@ public class FacilityService extends AbstractInfrastructureAdoService<Facility> 
 		return null;
 	}
 
-	public Predicate buildCriteriaFilter(FacilityCriteria facilityCriteria, CriteriaBuilder cb,
-			Root<Facility> from) {
+	public Predicate buildCriteriaFilter(FacilityCriteria facilityCriteria, CriteriaBuilder cb, Root<Facility> from) {
 		Predicate filter = null;
 		if (facilityCriteria.getRegion() != null) {
 			filter = and(cb, filter, cb.equal(from.join(Facility.REGION, JoinType.LEFT).get(Region.UUID), facilityCriteria.getRegion().getUuid()));
 		}
 		if (facilityCriteria.getDistrict() != null) {
-			filter = and(cb, filter, cb.equal(from.join(Facility.DISTRICT, JoinType.LEFT).get(District.UUID), facilityCriteria.getDistrict().getUuid()));
+			filter =
+				and(cb, filter, cb.equal(from.join(Facility.DISTRICT, JoinType.LEFT).get(District.UUID), facilityCriteria.getDistrict().getUuid()));
 		}
 		if (facilityCriteria.getCommunity() != null) {
-			filter = and(cb, filter, cb.equal(from.join(Facility.COMMUNITY, JoinType.LEFT).get(District.UUID), facilityCriteria.getCommunity().getUuid()));
+			filter =
+				and(cb, filter, cb.equal(from.join(Facility.COMMUNITY, JoinType.LEFT).get(District.UUID), facilityCriteria.getCommunity().getUuid()));
 		}
 		if (facilityCriteria.getNameCityLike() != null) {
 			String[] textFilters = facilityCriteria.getNameCityLike().split("\\s+");
 			for (int i = 0; i < textFilters.length; i++) {
 				String textFilter = "%" + textFilters[i].toLowerCase() + "%";
 				if (!DataHelper.isNullOrEmpty(textFilter)) {
-					Predicate likeFilters = cb.or(
-							cb.like(cb.lower(from.get(Facility.NAME)), textFilter),
-							cb.like(cb.lower(from.get(Facility.CITY)), textFilter));
+					Predicate likeFilters =
+						cb.or(cb.like(cb.lower(from.get(Facility.NAME)), textFilter), cb.like(cb.lower(from.get(Facility.CITY)), textFilter));
 					filter = and(cb, filter, likeFilters);
 				}
 			}
@@ -206,9 +201,7 @@ public class FacilityService extends AbstractInfrastructureAdoService<Facility> 
 		}
 		if (facilityCriteria.getRelevanceStatus() != null) {
 			if (facilityCriteria.getRelevanceStatus() == EntityRelevanceStatus.ACTIVE) {
-				filter = and(cb, filter, cb.or(
-						cb.equal(from.get(Facility.ARCHIVED), false),
-						cb.isNull(from.get(Facility.ARCHIVED))));
+				filter = and(cb, filter, cb.or(cb.equal(from.get(Facility.ARCHIVED), false), cb.isNull(from.get(Facility.ARCHIVED))));
 			} else if (facilityCriteria.getRelevanceStatus() == EntityRelevanceStatus.ARCHIVED) {
 				filter = and(cb, filter, cb.equal(from.get(Facility.ARCHIVED), true));
 			}

@@ -62,18 +62,12 @@ public class FeatureConfigurationFacadeEjb implements FeatureConfigurationFacade
 	public List<FeatureConfigurationDto> getAllAfter(Date date) {
 		User user = userService.getCurrentUser();
 
-		return service.getAllAfter(date, user)
-				.stream()
-				.map(d -> toDto(d))
-				.collect(Collectors.toList());
+		return service.getAllAfter(date, user).stream().map(d -> toDto(d)).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<FeatureConfigurationDto> getByUuids(List<String> uuids) {
-		return service.getByUuids(uuids)
-				.stream()
-				.map(d -> toDto(d))
-				.collect(Collectors.toList());
+		return service.getByUuids(uuids).stream().map(d -> toDto(d)).collect(Collectors.toList());
 	}
 
 	@Override
@@ -96,9 +90,15 @@ public class FeatureConfigurationFacadeEjb implements FeatureConfigurationFacade
 		Join<FeatureConfiguration, Region> regionJoin = root.join(FeatureConfiguration.REGION, JoinType.LEFT);
 		Join<FeatureConfiguration, District> districtJoin = root.join(FeatureConfiguration.DISTRICT, JoinType.LEFT);
 
-		cq.multiselect(root.get(FeatureConfiguration.UUID), regionJoin.get(Region.UUID), regionJoin.get(Region.NAME),
-				districtJoin.get(District.UUID), districtJoin.get(District.NAME), root.get(FeatureConfiguration.DISEASE),
-				root.get(FeatureConfiguration.ENABLED), root.get(FeatureConfiguration.END_DATE));
+		cq.multiselect(
+			root.get(FeatureConfiguration.UUID),
+			regionJoin.get(Region.UUID),
+			regionJoin.get(Region.NAME),
+			districtJoin.get(District.UUID),
+			districtJoin.get(District.NAME),
+			root.get(FeatureConfiguration.DISEASE),
+			root.get(FeatureConfiguration.ENABLED),
+			root.get(FeatureConfiguration.END_DATE));
 
 		if (criteria != null) {
 			Predicate filter = service.createCriteriaFilter(criteria, cb, cq, root);
@@ -123,8 +123,16 @@ public class FeatureConfigurationFacadeEjb implements FeatureConfigurationFacade
 				districts = districts.stream().filter(district -> !activeUuids.contains(district.getUuid())).collect(Collectors.toList());
 
 				for (District district : districts) {
-					resultList.add(new FeatureConfigurationIndexDto(DataHelper.createUuid(), district.getRegion().getUuid(), district.getRegion().getName(), 
-							district.getUuid(), district.getName(), criteria.getDisease(), false, null));
+					resultList.add(
+						new FeatureConfigurationIndexDto(
+							DataHelper.createUuid(),
+							district.getRegion().getUuid(),
+							district.getRegion().getName(),
+							district.getUuid(),
+							district.getName(),
+							criteria.getDisease(),
+							false,
+							null));
 				}
 			}
 		}
@@ -151,7 +159,7 @@ public class FeatureConfigurationFacadeEjb implements FeatureConfigurationFacade
 	}
 
 	@Override
-	public void saveFeatureConfiguration(FeatureConfigurationIndexDto configuration, FeatureType featureType) {	
+	public void saveFeatureConfiguration(FeatureConfigurationIndexDto configuration, FeatureType featureType) {
 		// Delete an existing configuration that was set inactive and is not a server feature
 		if (!featureType.isServerFeature() && Boolean.FALSE.equals(configuration.isEnabled())) {
 			FeatureConfiguration existingConfiguration = service.getByUuid(configuration.getUuid());
@@ -218,10 +226,7 @@ public class FeatureConfigurationFacadeEjb implements FeatureConfigurationFacade
 		CriteriaQuery<Long> cq = cb.createQuery(Long.class);
 		Root<FeatureConfiguration> root = cq.from(FeatureConfiguration.class);
 
-		cq.where(cb.and(
-				cb.equal(root.get(FeatureConfiguration.FEATURE_TYPE), featureType),
-				cb.isFalse(root.get(FeatureConfiguration.ENABLED))
-				));
+		cq.where(cb.and(cb.equal(root.get(FeatureConfiguration.FEATURE_TYPE), featureType), cb.isFalse(root.get(FeatureConfiguration.ENABLED))));
 		cq.select(cb.count(root));
 
 		return em.createQuery(cq).getSingleResult() > 0;

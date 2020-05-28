@@ -23,5 +23,5 @@ public class ExportConfigurationService extends AbstractAdoService<ExportConfigu
 		// A user should not query for this
 		throw new UnsupportedOperationException();
 	}
-	
+
 }

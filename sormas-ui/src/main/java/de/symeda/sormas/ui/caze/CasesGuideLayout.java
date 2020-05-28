@@ -15,11 +15,11 @@ public class CasesGuideLayout extends VerticalLayout {
 	public CasesGuideLayout() {
 		setMargin(true);
 		setSpacing(false);
-		
+
 		Label lblHeadingTermsDefinition = new Label(I18nProperties.getString(Strings.headingExplanationOfTerms));
 		CssStyles.style(lblHeadingTermsDefinition, CssStyles.H2);
 		addComponent(lblHeadingTermsDefinition);
-		
+
 		Label lblHeadingCompleteness = new Label(I18nProperties.getString(Strings.headingCompleteness));
 		CssStyles.style(lblHeadingCompleteness, CssStyles.H3, CssStyles.VSPACE_TOP_5);
 		addComponent(lblHeadingCompleteness);

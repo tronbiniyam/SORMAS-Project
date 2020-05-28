@@ -9,11 +9,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *******************************************************************************/
 package de.symeda.sormas.backend.sample;
 
@@ -99,25 +99,23 @@ public class PathogenTestService extends AbstractCoreAdoService<PathogenTest> {
 		Root<PathogenTest> from = cq.from(getElementClass());
 
 		Predicate filter = createDefaultFilter(cb, from);
-		
+
 		if (sample != null) {
 			filter = cb.and(filter, cb.equal(from.get(PathogenTest.SAMPLE), sample));
 		}
-		
+
 		cq.where(filter);
 		cq.orderBy(cb.desc(from.get(PathogenTest.TEST_DATE_TIME)));
 
 		return em.createQuery(cq).getResultList();
 	}
-	
+
 	public boolean hasPathogenTest(Sample sample) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<PathogenTest> cq = cb.createQuery(getElementClass());
 		Root<PathogenTest> from = cq.from(getElementClass());
-		
-		cq.where(cb.and(
-				createDefaultFilter(cb, from),
-				cb.equal(from.get(PathogenTest.SAMPLE), sample)));
+
+		cq.where(cb.and(createDefaultFilter(cb, from), cb.equal(from.get(PathogenTest.SAMPLE), sample)));
 		return !em.createQuery(cq).setMaxResults(1).getResultList().isEmpty();
 	}
 
@@ -127,33 +125,30 @@ public class PathogenTestService extends AbstractCoreAdoService<PathogenTest> {
 		Root<PathogenTest> from = cq.from(getElementClass());
 
 		Predicate filter = createDefaultFilter(cb, from);
-		
+
 		if (caze != null) {
 			Join<Object, Object> sampleJoin = from.join(PathogenTest.SAMPLE);
 			filter = cb.and(filter, cb.equal(sampleJoin.get(Sample.ASSOCIATED_CASE), caze));
 		}
-		
+
 		cq.where(filter);
 		cq.orderBy(cb.desc(from.get(PathogenTest.TEST_DATE_TIME)));
 
 		return em.createQuery(cq).getResultList();
 	}
-	
+
 	public List<PathogenTest> getBySampleUuids(List<String> sampleUuids) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<PathogenTest> cq = cb.createQuery(PathogenTest.class);
 		Root<PathogenTest> pathogenTestRoot = cq.from(PathogenTest.class);
 		Join<PathogenTest, Sample> sampleJoin = pathogenTestRoot.join(PathogenTest.SAMPLE, JoinType.LEFT);
-		
-		Predicate filter = cb.and(
-				createDefaultFilter(cb, pathogenTestRoot),
-				sampleJoin.get(AbstractDomainObject.UUID).in(sampleUuids)
-				);
-		
+
+		Predicate filter = cb.and(createDefaultFilter(cb, pathogenTestRoot), sampleJoin.get(AbstractDomainObject.UUID).in(sampleUuids));
+
 		cq.where(filter);
 		return em.createQuery(cq).getResultList();
 	}
-	
+
 	public List<String> getDeletedUuidsSince(User user, Date since) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<String> cq = cb.createQuery(String.class);
@@ -182,13 +177,11 @@ public class PathogenTestService extends AbstractCoreAdoService<PathogenTest> {
 		return em.createQuery(cq).getResultList();
 	}
 
-		public List<PathogenTestResultType> getPathogenTestResultsForCase(long caseId) {
+	public List<PathogenTestResultType> getPathogenTestResultsForCase(long caseId) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<PathogenTestResultType> cq = cb.createQuery(PathogenTestResultType.class);
 		Root<PathogenTest> root = cq.from(getElementClass());
-		cq.where(cb.and(
-				createDefaultFilter(cb, root),
-				cb.equal(root.get(PathogenTest.SAMPLE).get(Sample.ASSOCIATED_CASE).get(Case.ID), caseId)));
+		cq.where(cb.and(createDefaultFilter(cb, root), cb.equal(root.get(PathogenTest.SAMPLE).get(Sample.ASSOCIATED_CASE).get(Case.ID), caseId)));
 		cq.select(root.get(PathogenTest.TEST_RESULT));
 		List<PathogenTestResultType> result = em.createQuery(cq).getResultList();
 		return result;
@@ -207,12 +200,12 @@ public class PathogenTestService extends AbstractCoreAdoService<PathogenTest> {
 
 		return filter;
 	}
-	
+
 	@Override
 	public void delete(PathogenTest pathogenTest) {
 		super.delete(pathogenTest);
 	}
-	
+
 	/**
 	 * Creates a filter that excludes all pathogen tests that are either {@link CoreAdo#deleted} or associated with
 	 * samples whose case is {@link Case#archived}.
@@ -220,11 +213,9 @@ public class PathogenTestService extends AbstractCoreAdoService<PathogenTest> {
 	public Predicate createActiveTestsFilter(CriteriaBuilder cb, Root<PathogenTest> root) {
 		Join<PathogenTest, Sample> sample = root.join(PathogenTest.SAMPLE, JoinType.LEFT);
 		Join<Sample, Case> caze = sample.join(Sample.ASSOCIATED_CASE, JoinType.LEFT);
-		return cb.and(
-				cb.isFalse(caze.get(Case.ARCHIVED)),
-				cb.isFalse(root.get(PathogenTest.DELETED)));
+		return cb.and(cb.isFalse(caze.get(Case.ARCHIVED)), cb.isFalse(root.get(PathogenTest.DELETED)));
 	}
-	
+
 	/**
 	 * Creates a default filter that should be used as the basis of queries in this service..
 	 * This essentially removes {@link CoreAdo#deleted} pathogen tests from the queries.
@@ -232,5 +223,5 @@ public class PathogenTestService extends AbstractCoreAdoService<PathogenTest> {
 	public Predicate createDefaultFilter(CriteriaBuilder cb, Root<PathogenTest> root) {
 		return cb.isFalse(root.get(PathogenTest.DELETED));
 	}
-	
+
 }

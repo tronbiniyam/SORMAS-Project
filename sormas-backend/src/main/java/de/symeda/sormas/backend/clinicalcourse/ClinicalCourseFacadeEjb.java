@@ -43,12 +43,12 @@ public class ClinicalCourseFacadeEjb implements ClinicalCourseFacade {
 	PersonService personService;
 	@EJB
 	HealthConditionsService healthConditionsService;
-	
+
 	public static ClinicalCourseReferenceDto toReferenceDto(ClinicalCourse entity) {
 		if (entity == null) {
 			return null;
 		}
-		
+
 		ClinicalCourseReferenceDto dto = new ClinicalCourseReferenceDto(entity.getUuid(), entity.toString());
 		return dto;
 	}

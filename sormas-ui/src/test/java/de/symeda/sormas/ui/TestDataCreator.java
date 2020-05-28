@@ -9,11 +9,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *******************************************************************************/
 package de.symeda.sormas.ui;
 
@@ -68,9 +68,8 @@ public class TestDataCreator {
 	public TestDataCreator() {
 
 	}
-	
-	public UserDto createUser(String regionUuid, String districtUuid, String facilityUuid, String firstName,
-			String lastName, UserRole... roles) {
+
+	public UserDto createUser(String regionUuid, String districtUuid, String facilityUuid, String firstName, String lastName, UserRole... roles) {
 		UserDto user = UserDto.build();
 		user.setFirstName(firstName);
 		user.setLastName(lastName);
@@ -93,8 +92,13 @@ public class TestDataCreator {
 		return cazePerson;
 	}
 
-	public ContactDto createContact(UserReferenceDto reportingUser, UserReferenceDto contactOfficer,
-									PersonReferenceDto contactPerson, CaseDataDto caze, Date reportDateTime, Date lastContactDate) {
+	public ContactDto createContact(
+		UserReferenceDto reportingUser,
+		UserReferenceDto contactOfficer,
+		PersonReferenceDto contactPerson,
+		CaseDataDto caze,
+		Date reportDateTime,
+		Date lastContactDate) {
 		ContactDto contact = ContactDto.build(caze);
 		contact.setReportingUser(reportingUser);
 		contact.setContactOfficer(contactOfficer);
@@ -109,16 +113,28 @@ public class TestDataCreator {
 
 	public CaseDataDto createUnclassifiedCase(Disease disease) {
 		RDCF rdcf = createRDCF("Region", "District", "Community", "Facility");
-		UserDto user = createUser(rdcf.region.getUuid(), rdcf.district.getUuid(), rdcf.facility.getUuid(), "Surv",
-				"Sup", UserRole.SURVEILLANCE_SUPERVISOR);
+		UserDto user =
+			createUser(rdcf.region.getUuid(), rdcf.district.getUuid(), rdcf.facility.getUuid(), "Surv", "Sup", UserRole.SURVEILLANCE_SUPERVISOR);
 		PersonDto cazePerson = createPerson("Case", "Person");
-		return createCase(user.toReference(), cazePerson.toReference(), disease, CaseClassification.NOT_CLASSIFIED,
-				InvestigationStatus.PENDING, new Date(), rdcf);
+		return createCase(
+			user.toReference(),
+			cazePerson.toReference(),
+			disease,
+			CaseClassification.NOT_CLASSIFIED,
+			InvestigationStatus.PENDING,
+			new Date(),
+			rdcf);
 	}
 
-	public CaseDataDto createCase(UserReferenceDto user, PersonReferenceDto cazePerson, Disease disease,
-			CaseClassification caseClassification, InvestigationStatus investigationStatus, Date reportDate,
-			RDCF rdcf, String caseUuid) {
+	public CaseDataDto createCase(
+		UserReferenceDto user,
+		PersonReferenceDto cazePerson,
+		Disease disease,
+		CaseClassification caseClassification,
+		InvestigationStatus investigationStatus,
+		Date reportDate,
+		RDCF rdcf,
+		String caseUuid) {
 		CaseDataDto caze = CaseDataDto.build(cazePerson, disease);
 		if (caseUuid != null) {
 			caze.setUuid(caseUuid);
@@ -136,16 +152,28 @@ public class TestDataCreator {
 
 		return caze;
 	}
-	
-	public CaseDataDto createCase(UserReferenceDto user, PersonReferenceDto cazePerson, Disease disease,
-			CaseClassification caseClassification, InvestigationStatus investigationStatus, Date reportDate,
-			RDCF rdcf) {
+
+	public CaseDataDto createCase(
+		UserReferenceDto user,
+		PersonReferenceDto cazePerson,
+		Disease disease,
+		CaseClassification caseClassification,
+		InvestigationStatus investigationStatus,
+		Date reportDate,
+		RDCF rdcf) {
 		return createCase(user, cazePerson, disease, caseClassification, investigationStatus, reportDate, rdcf, null);
 	}
 
-	public TaskDto createTask(TaskContext context, TaskType type, TaskStatus status, CaseReferenceDto caze,
-			ContactReferenceDto contact, EventReferenceDto event, Date dueDate, UserReferenceDto assigneeUser) {
-		
+	public TaskDto createTask(
+		TaskContext context,
+		TaskType type,
+		TaskStatus status,
+		CaseReferenceDto caze,
+		ContactReferenceDto contact,
+		EventReferenceDto event,
+		Date dueDate,
+		UserReferenceDto assigneeUser) {
+
 		ReferenceDto entityRef;
 		switch (context) {
 		case CASE:
@@ -163,7 +191,7 @@ public class TestDataCreator {
 		default:
 			throw new IllegalArgumentException(context.toString());
 		}
-		
+
 		TaskDto task = TaskDto.build(context, entityRef);
 		task.setTaskType(type);
 		task.setTaskStatus(status);
@@ -175,8 +203,7 @@ public class TestDataCreator {
 		return task;
 	}
 
-	public VisitDto createVisit(Disease disease, PersonReferenceDto contactPerson, Date visitDateTime,
-			VisitStatus visitStatus) {
+	public VisitDto createVisit(Disease disease, PersonReferenceDto contactPerson, Date visitDateTime, VisitStatus visitStatus) {
 		VisitDto visit = VisitDto.build(contactPerson, disease);
 		visit.setVisitDateTime(visitDateTime);
 		visit.setVisitStatus(visitStatus);
@@ -185,8 +212,13 @@ public class TestDataCreator {
 		return visit;
 	}
 
-	public WeeklyReportDto createWeeklyReport(String facilityUuid, UserReferenceDto informant, Date reportDateTime,
-			int epiWeek, int year, int numberOfCases) {
+	public WeeklyReportDto createWeeklyReport(
+		String facilityUuid,
+		UserReferenceDto informant,
+		Date reportDateTime,
+		int epiWeek,
+		int year,
+		int numberOfCases) {
 		WeeklyReportDto report = new WeeklyReportDto();
 		report.setUuid(DataHelper.createUuid());
 		report.setHealthFacility(FacadeProvider.getFacilityFacade().getFacilityReferenceByUuid(facilityUuid));
@@ -201,9 +233,18 @@ public class TestDataCreator {
 		return report;
 	}
 
-	public EventDto createEvent(EventStatus eventStatus, String eventDesc, String srcFirstName,
-			String srcLastName, String srcTelNo, TypeOfPlace typeOfPlace, Date eventDate, Date reportDateTime,
-			UserReferenceDto reportingUser, UserReferenceDto surveillanceOfficer, Disease disease) {
+	public EventDto createEvent(
+		EventStatus eventStatus,
+		String eventDesc,
+		String srcFirstName,
+		String srcLastName,
+		String srcTelNo,
+		TypeOfPlace typeOfPlace,
+		Date eventDate,
+		Date reportDateTime,
+		UserReferenceDto reportingUser,
+		UserReferenceDto surveillanceOfficer,
+		Disease disease) {
 		EventDto event = EventDto.build();
 		event.setEventStatus(eventStatus);
 		event.setEventDesc(eventDesc);
@@ -222,8 +263,7 @@ public class TestDataCreator {
 		return event;
 	}
 
-	public EventParticipantDto createEventParticipant(EventReferenceDto event, PersonDto eventPerson,
-			String involvementDescription) {
+	public EventParticipantDto createEventParticipant(EventReferenceDto event, PersonDto eventPerson, String involvementDescription) {
 		EventParticipantDto eventParticipant = EventParticipantDto.build(event);
 		eventParticipant.setEvent(event);
 		eventParticipant.setPerson(eventPerson);
@@ -234,8 +274,13 @@ public class TestDataCreator {
 		return eventParticipant;
 	}
 
-	public SampleDto createSample(CaseReferenceDto associatedCase, Date sampleDateTime, Date reportDateTime,
-			UserReferenceDto reportingUser, SampleMaterial sampleMaterial, FacilityReferenceDto lab) {
+	public SampleDto createSample(
+		CaseReferenceDto associatedCase,
+		Date sampleDateTime,
+		Date reportDateTime,
+		UserReferenceDto reportingUser,
+		SampleMaterial sampleMaterial,
+		FacilityReferenceDto lab) {
 		SampleDto sample = SampleDto.build(reportingUser, associatedCase);
 		sample.setSampleDateTime(sampleDateTime);
 		sample.setReportDateTime(reportDateTime);
@@ -247,9 +292,15 @@ public class TestDataCreator {
 		return sample;
 	}
 
-	public PathogenTestDto createPathogenTest(SampleReferenceDto sample, PathogenTestType testType, Date testDateTime,
-			FacilityReferenceDto lab, UserReferenceDto labUser, PathogenTestResultType testResult, String testResultText,
-			boolean verified) {
+	public PathogenTestDto createPathogenTest(
+		SampleReferenceDto sample,
+		PathogenTestType testType,
+		Date testDateTime,
+		FacilityReferenceDto lab,
+		UserReferenceDto labUser,
+		PathogenTestResultType testResult,
+		String testResultText,
+		boolean verified) {
 		PathogenTestDto sampleTest = PathogenTestDto.build(sample, labUser);
 		sampleTest.setTestType(testType);
 		sampleTest.setTestDateTime(testDateTime);
@@ -263,21 +314,31 @@ public class TestDataCreator {
 		return sampleTest;
 	}
 
-	public PathogenTestDto createPathogenTest(CaseDataDto associatedCase, PathogenTestType testType,
-			PathogenTestResultType resultType) {
+	public PathogenTestDto createPathogenTest(CaseDataDto associatedCase, PathogenTestType testType, PathogenTestResultType resultType) {
 		RDCF rdcf = createRDCF("Region", "District", "Community", "Facility");
-		SampleDto sample = createSample(new CaseReferenceDto(associatedCase.getUuid()), new Date(), new Date(),
-				associatedCase.getReportingUser(), SampleMaterial.BLOOD, rdcf.facility.toReference());
-		return createPathogenTest(new SampleReferenceDto(sample.getUuid()), testType, new Date(),
-				rdcf.facility.toReference(), associatedCase.getReportingUser(), resultType, "", true);
+		SampleDto sample = createSample(
+			new CaseReferenceDto(associatedCase.getUuid()),
+			new Date(),
+			new Date(),
+			associatedCase.getReportingUser(),
+			SampleMaterial.BLOOD,
+			rdcf.facility.toReference());
+		return createPathogenTest(
+			new SampleReferenceDto(sample.getUuid()),
+			testType,
+			new Date(),
+			rdcf.facility.toReference(),
+			associatedCase.getReportingUser(),
+			resultType,
+			"",
+			true);
 	}
 
 	public RDCF createRDCF(String regionName, String districtName, String communityName, String facilityName) {
 		RegionDto region = createRegion(regionName);
 		DistrictDto district = createDistrict(districtName, region.toReference());
 		CommunityDto community = createCommunity(communityName, district.toReference());
-		FacilityDto facility = createFacility(facilityName, region.toReference(), district.toReference(),
-				community.toReference());
+		FacilityDto facility = createFacility(facilityName, region.toReference(), district.toReference(), community.toReference());
 
 		return new RDCF(region, district, community, facility);
 	}
@@ -310,8 +371,11 @@ public class TestDataCreator {
 		return community;
 	}
 
-	public FacilityDto createFacility(String facilityName, RegionReferenceDto region, DistrictReferenceDto district,
-			CommunityReferenceDto community) {
+	public FacilityDto createFacility(
+		String facilityName,
+		RegionReferenceDto region,
+		DistrictReferenceDto district,
+		CommunityReferenceDto community) {
 		FacilityDto facility = FacilityDto.build();
 		facility.setUuid(DataHelper.createUuid());
 		facility.setName(facilityName);
@@ -323,6 +387,7 @@ public class TestDataCreator {
 	}
 
 	public class RDCF {
+
 		public RegionDto region;
 		public DistrictDto district;
 		public CommunityDto community;

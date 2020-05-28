@@ -75,10 +75,11 @@ public class PointOfEntryFacadeEjb implements PointOfEntryFacade {
 	@Override
 	public List<PointOfEntryReferenceDto> getAllActiveByDistrict(String districtUuid, boolean includeOthers) {
 		District district = districtService.getByUuid(districtUuid);
-		return service.getAllByDistrict(district, includeOthers).stream()
-				.filter(p -> !p.isArchived())
-				.map(p -> toReferenceDto(p))
-				.collect(Collectors.toList());
+		return service.getAllByDistrict(district, includeOthers)
+			.stream()
+			.filter(p -> !p.isArchived())
+			.map(p -> toReferenceDto(p))
+			.collect(Collectors.toList());
 	}
 
 	@Override
@@ -108,11 +109,21 @@ public class PointOfEntryFacadeEjb implements PointOfEntryFacade {
 		Join<PointOfEntry, District> district = root.join(Facility.DISTRICT, JoinType.LEFT);
 		Join<PointOfEntry, Region> region = root.join(Facility.REGION, JoinType.LEFT);
 
-		cq.multiselect(root.get(PointOfEntry.CREATION_DATE), root.get(PointOfEntry.CHANGE_DATE), root.get(PointOfEntry.UUID), 
-				root.get(PointOfEntry.ARCHIVED), root.get(PointOfEntry.POINT_OF_ENTRY_TYPE), root.get(PointOfEntry.NAME),
-				region.get(Region.UUID), region.get(Region.NAME), district.get(District.UUID),
-				district.get(District.NAME), root.get(PointOfEntry.LATITUDE), root.get(PointOfEntry.LONGITUDE),
-				root.get(PointOfEntry.ACTIVE), root.get(PointOfEntry.EXTERNAL_ID));
+		cq.multiselect(
+			root.get(PointOfEntry.CREATION_DATE),
+			root.get(PointOfEntry.CHANGE_DATE),
+			root.get(PointOfEntry.UUID),
+			root.get(PointOfEntry.ARCHIVED),
+			root.get(PointOfEntry.POINT_OF_ENTRY_TYPE),
+			root.get(PointOfEntry.NAME),
+			region.get(Region.UUID),
+			region.get(Region.NAME),
+			district.get(District.UUID),
+			district.get(District.NAME),
+			root.get(PointOfEntry.LATITUDE),
+			root.get(PointOfEntry.LONGITUDE),
+			root.get(PointOfEntry.ACTIVE),
+			root.get(PointOfEntry.EXTERNAL_ID));
 	}
 
 	@Override
@@ -130,19 +141,18 @@ public class PointOfEntryFacadeEjb implements PointOfEntryFacade {
 
 	@Override
 	public List<PointOfEntryReferenceDto> getByName(String name, DistrictReferenceDto district, boolean includeArchivedEntities) {
-		return service.getByName(name, districtService.getByReferenceDto(district)).stream().map(p -> toReferenceDto(p))
-				.collect(Collectors.toList());
+		return service.getByName(name, districtService.getByReferenceDto(district)).stream().map(p -> toReferenceDto(p)).collect(Collectors.toList());
 	}
 
 	@Override
 	public void save(PointOfEntryDto dto) throws ValidationRuntimeException {
-		
-		PointOfEntry pointOfEntry = null; 
-		
-		if(dto.getUuid()!= null) {
+
+		PointOfEntry pointOfEntry = null;
+
+		if (dto.getUuid() != null) {
 			pointOfEntry = service.getByUuid(dto.getUuid());
 		}
-		
+
 		if (pointOfEntry == null && !getByName(dto.getName(), dto.getDistrict(), true).isEmpty()) {
 			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importPointOfEntryAlreadyExists));
 		}
@@ -156,11 +166,14 @@ public class PointOfEntryFacadeEjb implements PointOfEntryFacade {
 	@Override
 	public void validate(PointOfEntryDto pointOfEntry) throws ValidationRuntimeException {
 		if (StringUtils.isEmpty(pointOfEntry.getName())) {
-			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.required,
-					I18nProperties.getPrefixCaption(PointOfEntryDto.I18N_PREFIX, PointOfEntryDto.NAME)));
+			throw new ValidationRuntimeException(
+				I18nProperties
+					.getValidationError(Validations.required, I18nProperties.getPrefixCaption(PointOfEntryDto.I18N_PREFIX, PointOfEntryDto.NAME)));
 		}
 		if (pointOfEntry.getPointOfEntryType() == null) {
-			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.required,
+			throw new ValidationRuntimeException(
+				I18nProperties.getValidationError(
+					Validations.required,
 					I18nProperties.getPrefixCaption(PointOfEntryDto.I18N_PREFIX, PointOfEntryDto.POINT_OF_ENTRY_TYPE)));
 		}
 		if (pointOfEntry.getRegion() == null) {
@@ -169,15 +182,13 @@ public class PointOfEntryFacadeEjb implements PointOfEntryFacade {
 		if (pointOfEntry.getDistrict() == null) {
 			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.validDistrict));
 		}
-		if (!districtFacade.getDistrictByUuid(pointOfEntry.getDistrict().getUuid()).getRegion()
-				.equals(pointOfEntry.getRegion())) {
+		if (!districtFacade.getDistrictByUuid(pointOfEntry.getDistrict().getUuid()).getRegion().equals(pointOfEntry.getRegion())) {
 			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.noDistrictInRegion));
 		}
 	}
 
 	@Override
-	public List<PointOfEntryDto> getIndexList(PointOfEntryCriteria criteria, Integer first, Integer max,
-			List<SortProperty> sortProperties) {
+	public List<PointOfEntryDto> getIndexList(PointOfEntryCriteria criteria, Integer first, Integer max, List<SortProperty> sortProperties) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<PointOfEntry> cq = cb.createQuery(PointOfEntry.class);
 		Root<PointOfEntry> pointOfEntry = cq.from(PointOfEntry.class);
@@ -186,10 +197,10 @@ public class PointOfEntryFacadeEjb implements PointOfEntryFacade {
 
 		Predicate filter = service.buildCriteriaFilter(criteria, cb, pointOfEntry);
 		Predicate excludeFilter = cb.and(
-				cb.notEqual(pointOfEntry.get(PointOfEntry.UUID), PointOfEntryDto.OTHER_AIRPORT_UUID),
-				cb.notEqual(pointOfEntry.get(PointOfEntry.UUID), PointOfEntryDto.OTHER_SEAPORT_UUID),
-				cb.notEqual(pointOfEntry.get(PointOfEntry.UUID), PointOfEntryDto.OTHER_GROUND_CROSSING_UUID),
-				cb.notEqual(pointOfEntry.get(PointOfEntry.UUID), PointOfEntryDto.OTHER_POE_UUID));
+			cb.notEqual(pointOfEntry.get(PointOfEntry.UUID), PointOfEntryDto.OTHER_AIRPORT_UUID),
+			cb.notEqual(pointOfEntry.get(PointOfEntry.UUID), PointOfEntryDto.OTHER_SEAPORT_UUID),
+			cb.notEqual(pointOfEntry.get(PointOfEntry.UUID), PointOfEntryDto.OTHER_GROUND_CROSSING_UUID),
+			cb.notEqual(pointOfEntry.get(PointOfEntry.UUID), PointOfEntryDto.OTHER_POE_UUID));
 
 		if (filter != null) {
 			filter = AbstractAdoService.and(cb, filter, excludeFilter);
@@ -227,14 +238,19 @@ public class PointOfEntryFacadeEjb implements PointOfEntryFacade {
 			}
 			cq.orderBy(order);
 		} else {
-			cq.orderBy(cb.asc(region.get(Region.NAME)), cb.asc(district.get(District.NAME)),
-					cb.asc(pointOfEntry.get(PointOfEntry.NAME)));
+			cq.orderBy(cb.asc(region.get(Region.NAME)), cb.asc(district.get(District.NAME)), cb.asc(pointOfEntry.get(PointOfEntry.NAME)));
 		}
 
 		cq.select(pointOfEntry);
 
 		if (first != null && max != null) {
-			return em.createQuery(cq).setFirstResult(first).setMaxResults(max).getResultList().stream().map(f -> toDto(f)).collect(Collectors.toList());
+			return em.createQuery(cq)
+				.setFirstResult(first)
+				.setMaxResults(max)
+				.getResultList()
+				.stream()
+				.map(f -> toDto(f))
+				.collect(Collectors.toList());
 		} else {
 			return em.createQuery(cq).getResultList().stream().map(f -> toDto(f)).collect(Collectors.toList());
 		}
@@ -247,10 +263,11 @@ public class PointOfEntryFacadeEjb implements PointOfEntryFacade {
 		Root<PointOfEntry> root = cq.from(PointOfEntry.class);
 
 		Predicate filter = service.buildCriteriaFilter(criteria, cb, root);
-		Predicate excludeFilter = cb.and(cb.notEqual(root.get(PointOfEntry.UUID), PointOfEntryDto.OTHER_AIRPORT_UUID),
-				cb.notEqual(root.get(PointOfEntry.UUID), PointOfEntryDto.OTHER_SEAPORT_UUID),
-				cb.notEqual(root.get(PointOfEntry.UUID), PointOfEntryDto.OTHER_GROUND_CROSSING_UUID),
-				cb.notEqual(root.get(PointOfEntry.UUID), PointOfEntryDto.OTHER_POE_UUID));
+		Predicate excludeFilter = cb.and(
+			cb.notEqual(root.get(PointOfEntry.UUID), PointOfEntryDto.OTHER_AIRPORT_UUID),
+			cb.notEqual(root.get(PointOfEntry.UUID), PointOfEntryDto.OTHER_SEAPORT_UUID),
+			cb.notEqual(root.get(PointOfEntry.UUID), PointOfEntryDto.OTHER_GROUND_CROSSING_UUID),
+			cb.notEqual(root.get(PointOfEntry.UUID), PointOfEntryDto.OTHER_POE_UUID));
 
 		if (filter != null) {
 			filter = AbstractAdoService.and(cb, filter, excludeFilter);
@@ -279,7 +296,7 @@ public class PointOfEntryFacadeEjb implements PointOfEntryFacade {
 		pointOfEntry.setArchived(false);
 		service.ensurePersisted(pointOfEntry);
 	}
-	
+
 	@Override
 	public boolean hasArchivedParentInfrastructure(Collection<String> pointOfEntryUuids) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -289,14 +306,9 @@ public class PointOfEntryFacadeEjb implements PointOfEntryFacade {
 		Join<PointOfEntry, Region> regionJoin = root.join(PointOfEntry.REGION);
 
 		cq.where(
-				cb.and(
-						cb.or(
-								cb.isTrue(districtJoin.get(District.ARCHIVED)),
-								cb.isTrue(regionJoin.get(Region.ARCHIVED))
-								),
-						root.get(PointOfEntry.UUID).in(pointOfEntryUuids)
-						)
-				);
+			cb.and(
+				cb.or(cb.isTrue(districtJoin.get(District.ARCHIVED)), cb.isTrue(regionJoin.get(Region.ARCHIVED))),
+				root.get(PointOfEntry.UUID).in(pointOfEntryUuids)));
 
 		cq.select(root.get(PointOfEntry.ID));
 

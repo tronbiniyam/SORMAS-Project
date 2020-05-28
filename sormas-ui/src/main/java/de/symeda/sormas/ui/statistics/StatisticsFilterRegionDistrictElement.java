@@ -9,11 +9,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *******************************************************************************/
 package de.symeda.sormas.ui.statistics;
 
@@ -39,10 +39,18 @@ public class StatisticsFilterRegionDistrictElement extends StatisticsFilterEleme
 		addStyleName(CssStyles.LAYOUT_MINIMAL);
 		setWidth(100, Unit.PERCENTAGE);
 
-		regionElement = new StatisticsFilterValuesElement(I18nProperties.getPrefixCaption(LocationDto.I18N_PREFIX, LocationDto.REGION),
-				StatisticsCaseAttribute.REGION_DISTRICT, StatisticsCaseSubAttribute.REGION, this, rowIndex);
-		districtElement = new StatisticsFilterValuesElement(I18nProperties.getPrefixCaption(LocationDto.I18N_PREFIX, LocationDto.DISTRICT),
-				StatisticsCaseAttribute.REGION_DISTRICT, StatisticsCaseSubAttribute.DISTRICT, this, rowIndex);
+		regionElement = new StatisticsFilterValuesElement(
+			I18nProperties.getPrefixCaption(LocationDto.I18N_PREFIX, LocationDto.REGION),
+			StatisticsCaseAttribute.REGION_DISTRICT,
+			StatisticsCaseSubAttribute.REGION,
+			this,
+			rowIndex);
+		districtElement = new StatisticsFilterValuesElement(
+			I18nProperties.getPrefixCaption(LocationDto.I18N_PREFIX, LocationDto.DISTRICT),
+			StatisticsCaseAttribute.REGION_DISTRICT,
+			StatisticsCaseSubAttribute.DISTRICT,
+			this,
+			rowIndex);
 
 		addComponent(regionElement);
 		addComponent(districtElement);
@@ -53,9 +61,8 @@ public class StatisticsFilterRegionDistrictElement extends StatisticsFilterEleme
 			if (regionElement.getSelectedValues() != null && districtElement.getSelectedValues() != null) {
 				List<TokenizableValue> regionValues = regionElement.getSelectedValues();
 				for (TokenizableValue districtValue : districtElement.getSelectedValues()) {
-					RegionReferenceDto regionRef = FacadeProvider.getDistrictFacade()
-							.getDistrictByUuid(((DistrictReferenceDto) districtValue.getValue()).getUuid())
-							.getRegion();
+					RegionReferenceDto regionRef =
+						FacadeProvider.getDistrictFacade().getDistrictByUuid(((DistrictReferenceDto) districtValue.getValue()).getUuid()).getRegion();
 					boolean keepDistrictValue = false;
 					for (TokenizableValue regionValue : regionValues) {
 						if (regionValue.getValue().equals(regionRef)) {

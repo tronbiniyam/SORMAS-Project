@@ -9,11 +9,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *******************************************************************************/
 package de.symeda.sormas.backend.user;
 
@@ -52,18 +52,17 @@ public class UserRoleConfigFacadeEjb implements UserRoleConfigFacade {
 	@Override
 	public List<UserRoleConfigDto> getAll() {
 		return userRoleConfigService.getAll().stream().map(c -> toDto(c)).collect(Collectors.toList());
-	}	
-	
+	}
+
 	@Override
 	public List<String> getAllUuids() {
 		if (userService.getCurrentUser() == null) {
 			return Collections.emptyList();
 		}
-		
+
 		return userRoleConfigService.getAllUuids();
 	}
-	
-	
+
 	@Override
 	public List<String> getDeletedUuids(Date since) {
 		return userRoleConfigService.getDeletedUuids(since);
@@ -90,7 +89,7 @@ public class UserRoleConfigFacadeEjb implements UserRoleConfigFacade {
 	@Override
 	public Set<UserRight> getEffectiveUserRights(UserRole... userRoles) {
 		Set<UserRight> userRights = EnumSet.noneOf(UserRight.class);
-		
+
 		for (UserRole userRole : userRoles) {
 			UserRoleConfig userRoleConfig = userRoleConfigService.getByUserRole(userRole);
 			if (userRoleConfig != null) {
@@ -141,5 +140,5 @@ public class UserRoleConfigFacadeEjb implements UserRoleConfigFacade {
 	@Stateless
 	public static class UserRoleConfigFacadeEjbLocal extends UserRoleConfigFacadeEjb {
 	}
-	
+
 }

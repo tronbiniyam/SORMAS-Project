@@ -9,11 +9,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *******************************************************************************/
 package de.symeda.sormas.backend.task;
 
@@ -113,7 +113,7 @@ public class TaskFacadeEjb implements TaskFacade {
 	@EJB
 	private UserRoleConfigFacadeEjbLocal userRoleConfigFacade;
 
-	public Task fromDto(TaskDto source) {		
+	public Task fromDto(TaskDto source) {
 		if (source == null) {
 			return null;
 		}
@@ -125,7 +125,7 @@ public class TaskFacadeEjb implements TaskFacade {
 			if (source.getCreationDate() != null) {
 				target.setCreationDate(new Timestamp(source.getCreationDate().getTime()));
 			}
-		} 
+		}
 		DtoHelper.validateDto(source, target);
 
 		target.setAssigneeUser(userService.getByReferenceDto(source.getAssigneeUser()));
@@ -208,7 +208,7 @@ public class TaskFacadeEjb implements TaskFacade {
 		target.setStatusChangeDate(source.getStatusChangeDate());
 		target.setTaskContext(source.getTaskContext());
 		target.setTaskStatus(source.getTaskStatus());
-		target.setTaskType(source.getTaskType());	
+		target.setTaskType(source.getTaskType());
 		target.setCaze(CaseFacadeEjb.toReferenceDto(source.getCaze()));
 		target.setContact(ContactFacadeEjb.toReferenceDto(source.getContact()));
 		target.setEvent(EventFacadeEjb.toReferenceDto(source.getEvent()));
@@ -231,24 +231,38 @@ public class TaskFacadeEjb implements TaskFacade {
 		}
 
 		if (ado.getTaskType() == TaskType.CONTACT_FOLLOW_UP && ado.getTaskStatus() == TaskStatus.DONE && ado.getContact() != null) {
-			Region recipientRegion = ado.getContact().getRegion() != null ? ado.getContact().getRegion() : ado.getContact().getCaze() != null ? ado.getContact().getCaze().getRegion() : null;
+			Region recipientRegion = ado.getContact().getRegion() != null
+				? ado.getContact().getRegion()
+				: ado.getContact().getCaze() != null ? ado.getContact().getCaze().getRegion() : null;
 			if (recipientRegion != null) {
-				List<User> messageRecipients = userService.getAllByRegionAndUserRoles(recipientRegion, 
-						UserRole.SURVEILLANCE_SUPERVISOR, UserRole.CASE_SUPERVISOR, UserRole.CONTACT_SUPERVISOR);
+				List<User> messageRecipients = userService.getAllByRegionAndUserRoles(
+					recipientRegion,
+					UserRole.SURVEILLANCE_SUPERVISOR,
+					UserRole.CASE_SUPERVISOR,
+					UserRole.CONTACT_SUPERVISOR);
 				for (User recipient : messageRecipients) {
 					try {
-						messagingService.sendMessage(recipient, I18nProperties.getString(MessagingService.SUBJECT_VISIT_COMPLETED), 
-								String.format(I18nProperties.getString(MessagingService.CONTENT_VISIT_COMPLETED), DataHelper.getShortUuid(ado.getContact().getUuid()), DataHelper.getShortUuid(ado.getAssigneeUser().getUuid())), 
-								MessageType.EMAIL, MessageType.SMS);
+						messagingService.sendMessage(
+							recipient,
+							I18nProperties.getString(MessagingService.SUBJECT_VISIT_COMPLETED),
+							String.format(
+								I18nProperties.getString(MessagingService.CONTENT_VISIT_COMPLETED),
+								DataHelper.getShortUuid(ado.getContact().getUuid()),
+								DataHelper.getShortUuid(ado.getAssigneeUser().getUuid())),
+							MessageType.EMAIL,
+							MessageType.SMS);
 					} catch (NotificationDeliveryFailedException e) {
-						logger.error(String.format("NotificationDeliveryFailedException when trying to notify supervisors about the completion of a follow-up visit. "
-								+ "Failed to send " + e.getMessageType() + " to user with UUID %s.", recipient.getUuid()));
+						logger.error(
+							String.format(
+								"NotificationDeliveryFailedException when trying to notify supervisors about the completion of a follow-up visit. "
+									+ "Failed to send " + e.getMessageType() + " to user with UUID %s.",
+								recipient.getUuid()));
 					}
 				}
 			}
 		}
 
-		return toDto(ado);	
+		return toDto(ado);
 	}
 
 	@Override
@@ -270,9 +284,7 @@ public class TaskFacadeEjb implements TaskFacade {
 			return Collections.emptyList();
 		}
 
-		return taskService.getAllActiveTasksAfter(date, user).stream()
-				.map(c -> toDto(c))
-				.collect(Collectors.toList());
+		return taskService.getAllActiveTasksAfter(date, user).stream().map(c -> toDto(c)).collect(Collectors.toList());
 	}
 
 	@Override
@@ -314,16 +326,35 @@ public class TaskFacadeEjb implements TaskFacade {
 		Join<Task, User> creator = task.join(Task.CREATOR_USER, JoinType.LEFT);
 		Join<Task, User> assignee = task.join(Task.ASSIGNEE_USER, JoinType.LEFT);
 
-		cq.multiselect(task.get(Task.UUID), task.get(Task.TASK_CONTEXT), 
-				caze.get(Case.UUID), cazePerson.get(Person.FIRST_NAME), cazePerson.get(Person.LAST_NAME),
-				event.get(Event.UUID), event.get(Event.DISEASE), event.get(Event.DISEASE_DETAILS), event.get(Event.EVENT_STATUS), event.get(Event.EVENT_DATE),
-				contact.get(Contact.UUID), contactPerson.get(Person.FIRST_NAME), contactPerson.get(Person.LAST_NAME),
-				contactCasePerson.get(Person.FIRST_NAME), contactCasePerson.get(Person.LAST_NAME),
-				task.get(Task.TASK_TYPE), task.get(Task.PRIORITY), 
-				task.get(Task.DUE_DATE), task.get(Task.SUGGESTED_START), task.get(Task.TASK_STATUS),
-				creator.get(User.UUID), creator.get(User.FIRST_NAME), creator.get(User.LAST_NAME), task.get(Task.CREATOR_COMMENT),
-				assignee.get(User.UUID), assignee.get(User.FIRST_NAME), assignee.get(User.LAST_NAME), task.get(Task.ASSIGNEE_REPLY)
-				);
+		cq.multiselect(
+			task.get(Task.UUID),
+			task.get(Task.TASK_CONTEXT),
+			caze.get(Case.UUID),
+			cazePerson.get(Person.FIRST_NAME),
+			cazePerson.get(Person.LAST_NAME),
+			event.get(Event.UUID),
+			event.get(Event.DISEASE),
+			event.get(Event.DISEASE_DETAILS),
+			event.get(Event.EVENT_STATUS),
+			event.get(Event.EVENT_DATE),
+			contact.get(Contact.UUID),
+			contactPerson.get(Person.FIRST_NAME),
+			contactPerson.get(Person.LAST_NAME),
+			contactCasePerson.get(Person.FIRST_NAME),
+			contactCasePerson.get(Person.LAST_NAME),
+			task.get(Task.TASK_TYPE),
+			task.get(Task.PRIORITY),
+			task.get(Task.DUE_DATE),
+			task.get(Task.SUGGESTED_START),
+			task.get(Task.TASK_STATUS),
+			creator.get(User.UUID),
+			creator.get(User.FIRST_NAME),
+			creator.get(User.LAST_NAME),
+			task.get(Task.CREATOR_COMMENT),
+			assignee.get(User.UUID),
+			assignee.get(User.FIRST_NAME),
+			assignee.get(User.LAST_NAME),
+			task.get(Task.ASSIGNEE_REPLY));
 
 		Predicate filter = null;
 		if (taskCriteria == null || !taskCriteria.hasContextCriteria()) {
@@ -392,46 +423,34 @@ public class TaskFacadeEjb implements TaskFacade {
 
 	@Override
 	public List<TaskDto> getAllByCase(CaseReferenceDto caseRef) {
-		if(caseRef == null) {
+		if (caseRef == null) {
 			return Collections.emptyList();
 		}
 
-		return taskService.findBy(new TaskCriteria().caze(caseRef))
-				.stream()
-				.map(c -> toDto(c))
-				.collect(Collectors.toList());
+		return taskService.findBy(new TaskCriteria().caze(caseRef)).stream().map(c -> toDto(c)).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<TaskDto> getAllByContact(ContactReferenceDto contactRef) {
-		if(contactRef == null) {
+		if (contactRef == null) {
 			return Collections.emptyList();
 		}
 
-		return taskService.findBy(new TaskCriteria().contact(contactRef))
-				.stream()
-				.map(c -> toDto(c))
-				.collect(Collectors.toList());
+		return taskService.findBy(new TaskCriteria().contact(contactRef)).stream().map(c -> toDto(c)).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<TaskDto> getAllByEvent(EventReferenceDto eventRef) {
-		if(eventRef == null) {
+		if (eventRef == null) {
 			return Collections.emptyList();
 		}
 
-		return taskService.findBy(new TaskCriteria().event(eventRef))
-				.stream()
-				.map(c -> toDto(c))
-				.collect(Collectors.toList());
+		return taskService.findBy(new TaskCriteria().event(eventRef)).stream().map(c -> toDto(c)).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<TaskDto> getByUuids(List<String> uuids) {
-		return taskService.getByUuids(uuids)
-				.stream()
-				.map(c -> toDto(c))
-				.collect(Collectors.toList());
+		return taskService.getByUuids(uuids).stream().map(c -> toDto(c)).collect(Collectors.toList());
 	}
 
 	@Override
@@ -441,14 +460,14 @@ public class TaskFacadeEjb implements TaskFacade {
 		}
 
 		return taskService.findBy(new TaskCriteria().caze(caseRef).taskStatus(TaskStatus.PENDING))
-				.stream()
-				.map(c -> toDto(c))
-				.collect(Collectors.toList());
+			.stream()
+			.map(c -> toDto(c))
+			.collect(Collectors.toList());
 	}
 
 	@Override
 	public long getPendingTaskCountByContact(ContactReferenceDto contactRef) {
-		if(contactRef == null) {
+		if (contactRef == null) {
 			return 0;
 		}
 
@@ -457,7 +476,7 @@ public class TaskFacadeEjb implements TaskFacade {
 
 	@Override
 	public long getPendingTaskCountByEvent(EventReferenceDto eventRef) {
-		if(eventRef == null) {
+		if (eventRef == null) {
 			return 0;
 		}
 
@@ -477,7 +496,8 @@ public class TaskFacadeEjb implements TaskFacade {
 	@Override
 	public void deleteTask(TaskDto taskDto) {
 		User user = userService.getCurrentUser();
-		if (!userRoleConfigFacade.getEffectiveUserRights(user.getUserRoles().toArray(new UserRole[user.getUserRoles().size()])).contains(UserRight.TASK_DELETE)) {
+		if (!userRoleConfigFacade.getEffectiveUserRights(user.getUserRoles().toArray(new UserRole[user.getUserRoles().size()]))
+			.contains(UserRight.TASK_DELETE)) {
 			throw new UnsupportedOperationException("User " + user.getUuid() + " is not allowed to delete tasks.");
 		}
 
@@ -497,52 +517,64 @@ public class TaskFacadeEjb implements TaskFacade {
 		List<Task> startingTasks = taskService.findBy(new TaskCriteria().taskStatus(TaskStatus.PENDING).startDateBetween(before, now));
 		for (Task task : startingTasks) {
 			TaskContext context = task.getTaskContext();
-			AbstractDomainObject associatedEntity = context == TaskContext.CASE ? task.getCaze() : 
-				context == TaskContext.CONTACT ? task.getContact() : 
-					context == TaskContext.EVENT ? task.getEvent() : null;
-					if (task.getAssigneeUser() != null && task.getAssigneeUser().isSupervisor() || task.getAssigneeUser().getUserRoles().contains(UserRole.NATIONAL_USER)) {
-						try {
-							String subject = I18nProperties.getString(MessagingService.SUBJECT_TASK_START);
-							String content = context == TaskContext.GENERAL ? 
-									String.format(I18nProperties.getString(MessagingService.CONTENT_TASK_START_GENERAL), task.getTaskType().toString()) :
-										String.format(I18nProperties.getString(MessagingService.CONTENT_TASK_START_SPECIFIC), task.getTaskType().toString(), 
-												context.toString() + " " + DataHelper.getShortUuid(associatedEntity.getUuid()));
+			AbstractDomainObject associatedEntity = context == TaskContext.CASE
+				? task.getCaze()
+				: context == TaskContext.CONTACT ? task.getContact() : context == TaskContext.EVENT ? task.getEvent() : null;
+			if (task.getAssigneeUser() != null && task.getAssigneeUser().isSupervisor()
+				|| task.getAssigneeUser().getUserRoles().contains(UserRole.NATIONAL_USER)) {
+				try {
+					String subject = I18nProperties.getString(MessagingService.SUBJECT_TASK_START);
+					String content = context == TaskContext.GENERAL
+						? String.format(I18nProperties.getString(MessagingService.CONTENT_TASK_START_GENERAL), task.getTaskType().toString())
+						: String.format(
+							I18nProperties.getString(MessagingService.CONTENT_TASK_START_SPECIFIC),
+							task.getTaskType().toString(),
+							context.toString() + " " + DataHelper.getShortUuid(associatedEntity.getUuid()));
 
-									messagingService.sendMessage(userService.getByUuid(task.getAssigneeUser().getUuid()), subject, content, MessageType.EMAIL, MessageType.SMS);
-						} catch (NotificationDeliveryFailedException e) {
-							logger.error(String.format("EmailDeliveryFailedException when trying to notify a user about a starting task. "
-									+ "Failed to send " + e.getMessageType() + " to user with UUID %s.", task.getAssigneeUser().getUuid()));
-						}
-					}
+					messagingService
+						.sendMessage(userService.getByUuid(task.getAssigneeUser().getUuid()), subject, content, MessageType.EMAIL, MessageType.SMS);
+				} catch (NotificationDeliveryFailedException e) {
+					logger.error(
+						String.format(
+							"EmailDeliveryFailedException when trying to notify a user about a starting task. " + "Failed to send "
+								+ e.getMessageType() + " to user with UUID %s.",
+							task.getAssigneeUser().getUuid()));
+				}
+			}
 		}
 
 		List<Task> dueTasks = taskService.findBy(new TaskCriteria().taskStatus(TaskStatus.PENDING).dueDateBetween(before, now));
 		for (Task task : dueTasks) {
 			TaskContext context = task.getTaskContext();
-			AbstractDomainObject associatedEntity = context == TaskContext.CASE ? task.getCaze() : 
-				context == TaskContext.CONTACT ? task.getContact() : 
-					context == TaskContext.EVENT ? task.getEvent() : null;
-					if (task.getAssigneeUser() != null && (task.getAssigneeUser().isSupervisor() 
-							|| task.getAssigneeUser().getUserRoles().contains(UserRole.NATIONAL_USER))) {
-						try {
-							String subject = I18nProperties.getString(MessagingService.SUBJECT_TASK_DUE);
-							String content = context == TaskContext.GENERAL ? 
-									String.format(I18nProperties.getString(MessagingService.CONTENT_TASK_DUE_GENERAL), task.getTaskType().toString()) :
-										String.format(I18nProperties.getString(MessagingService.CONTENT_TASK_DUE_SPECIFIC), task.getTaskType().toString(), 
-												context.toString() + (associatedEntity != null ? (" " + DataHelper.getShortUuid(associatedEntity.getUuid())) : ""));
+			AbstractDomainObject associatedEntity = context == TaskContext.CASE
+				? task.getCaze()
+				: context == TaskContext.CONTACT ? task.getContact() : context == TaskContext.EVENT ? task.getEvent() : null;
+			if (task.getAssigneeUser() != null
+				&& (task.getAssigneeUser().isSupervisor() || task.getAssigneeUser().getUserRoles().contains(UserRole.NATIONAL_USER))) {
+				try {
+					String subject = I18nProperties.getString(MessagingService.SUBJECT_TASK_DUE);
+					String content = context == TaskContext.GENERAL
+						? String.format(I18nProperties.getString(MessagingService.CONTENT_TASK_DUE_GENERAL), task.getTaskType().toString())
+						: String.format(
+							I18nProperties.getString(MessagingService.CONTENT_TASK_DUE_SPECIFIC),
+							task.getTaskType().toString(),
+							context.toString() + (associatedEntity != null ? (" " + DataHelper.getShortUuid(associatedEntity.getUuid())) : ""));
 
-									messagingService.sendMessage(userService.getByUuid(task.getAssigneeUser().getUuid()), subject, content, MessageType.EMAIL, MessageType.SMS);
-						} catch (NotificationDeliveryFailedException e) {
-							logger.error(String.format("EmailDeliveryFailedException when trying to notify a user about a due task. "
-									+ "Failed to send " + e.getMessageType() + " to user with UUID %s.", task.getAssigneeUser().getUuid()));
-						}
-					}
+					messagingService
+						.sendMessage(userService.getByUuid(task.getAssigneeUser().getUuid()), subject, content, MessageType.EMAIL, MessageType.SMS);
+				} catch (NotificationDeliveryFailedException e) {
+					logger.error(
+						String.format(
+							"EmailDeliveryFailedException when trying to notify a user about a due task. " + "Failed to send " + e.getMessageType()
+								+ " to user with UUID %s.",
+							task.getAssigneeUser().getUuid()));
+				}
+			}
 		}
 	}
 
 	@LocalBean
 	@Stateless
 	public static class TaskFacadeEjbLocal extends TaskFacadeEjb {
-	}	
+	}
 }
-

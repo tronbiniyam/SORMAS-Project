@@ -9,11 +9,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *******************************************************************************/
 package de.symeda.sormas.backend.importexport;
 
@@ -130,29 +130,20 @@ public class ImportFacadeEjb implements ImportFacade {
 	@EJB
 	private EpiDataService epiDataService;
 
-	private static final String CASE_IMPORT_TEMPLATE_FILE_NAME = ImportExportUtils.FILE_PREFIX
-			+ "_import_case_template.csv";
-	private static final String CASE_CONTACT_IMPORT_TEMPLATE_FILE_NAME = ImportExportUtils.FILE_PREFIX
-			+ "_import_case_contact_template.csv";
-	private static final String CASE_LINE_LISTING_IMPORT_TEMPLATE_FILE_NAME = ImportExportUtils.FILE_PREFIX
-			+ "_import_line_listing_template.csv";
-	private static final String POINT_OF_ENTRY_IMPORT_TEMPLATE_FILE_NAME = ImportExportUtils.FILE_PREFIX
-			+ "_import_point_of_entry_template.csv";
-	private static final String POPULATION_DATA_IMPORT_TEMPLATE_FILE_NAME = ImportExportUtils.FILE_PREFIX
-			+ "_import_population_data_template.csv";
-	private static final String REGION_IMPORT_TEMPLATE_FILE_NAME = ImportExportUtils.FILE_PREFIX
-			+ "_import_region_template.csv";
-	private static final String DISTRICT_IMPORT_TEMPLATE_FILE_NAME = ImportExportUtils.FILE_PREFIX
-			+ "_import_district_template.csv";
-	private static final String COMMUNITY_IMPORT_TEMPLATE_FILE_NAME = ImportExportUtils.FILE_PREFIX
-			+ "_import_community_template.csv";
-	private static final String FACILITY_LABORATORY_IMPORT_TEMPLATE_FILE_NAME = ImportExportUtils.FILE_PREFIX
-			+ "_import_facility_laboratory_template.csv";
-	private static final String CONTACT_IMPORT_TEMPLATE_FILE_NAME = ImportExportUtils.FILE_PREFIX
-			+ "_import_contact_template.csv";
+	private static final String CASE_IMPORT_TEMPLATE_FILE_NAME = ImportExportUtils.FILE_PREFIX + "_import_case_template.csv";
+	private static final String CASE_CONTACT_IMPORT_TEMPLATE_FILE_NAME = ImportExportUtils.FILE_PREFIX + "_import_case_contact_template.csv";
+	private static final String CASE_LINE_LISTING_IMPORT_TEMPLATE_FILE_NAME = ImportExportUtils.FILE_PREFIX + "_import_line_listing_template.csv";
+	private static final String POINT_OF_ENTRY_IMPORT_TEMPLATE_FILE_NAME = ImportExportUtils.FILE_PREFIX + "_import_point_of_entry_template.csv";
+	private static final String POPULATION_DATA_IMPORT_TEMPLATE_FILE_NAME = ImportExportUtils.FILE_PREFIX + "_import_population_data_template.csv";
+	private static final String REGION_IMPORT_TEMPLATE_FILE_NAME = ImportExportUtils.FILE_PREFIX + "_import_region_template.csv";
+	private static final String DISTRICT_IMPORT_TEMPLATE_FILE_NAME = ImportExportUtils.FILE_PREFIX + "_import_district_template.csv";
+	private static final String COMMUNITY_IMPORT_TEMPLATE_FILE_NAME = ImportExportUtils.FILE_PREFIX + "_import_community_template.csv";
+	private static final String FACILITY_LABORATORY_IMPORT_TEMPLATE_FILE_NAME =
+		ImportExportUtils.FILE_PREFIX + "_import_facility_laboratory_template.csv";
+	private static final String CONTACT_IMPORT_TEMPLATE_FILE_NAME = ImportExportUtils.FILE_PREFIX + "_import_contact_template.csv";
 
 	@Override
-	public void generateCaseImportTemplateFile() throws IOException {				
+	public void generateCaseImportTemplateFile() throws IOException {
 		createExportDirectoryIfNessecary();
 
 		List<String> columnNames = new ArrayList<>();
@@ -167,7 +158,7 @@ public class ImportFacadeEjb implements ImportFacade {
 			writer.flush();
 		}
 	}
-	
+
 	@Override
 	public void generateCaseContactImportTemplateFile() throws IOException {
 		createExportDirectoryIfNessecary();
@@ -175,8 +166,14 @@ public class ImportFacadeEjb implements ImportFacade {
 		List<String> columnNames = new ArrayList<>();
 		List<String> entityNames = new ArrayList<>();
 		appendListOfFields(columnNames, entityNames, ContactDto.class, "");
-		columnNames.removeAll(Arrays.asList(ContactDto.CAZE, ContactDto.DISEASE, ContactDto.DISEASE_DETAILS,
-				ContactDto.RESULTING_CASE, ContactDto.CASE_ID_EXTERNAL_SYSTEM, ContactDto.CASE_OR_EVENT_INFORMATION));
+		columnNames.removeAll(
+			Arrays.asList(
+				ContactDto.CAZE,
+				ContactDto.DISEASE,
+				ContactDto.DISEASE_DETAILS,
+				ContactDto.RESULTING_CASE,
+				ContactDto.CASE_ID_EXTERNAL_SYSTEM,
+				ContactDto.CASE_OR_EVENT_INFORMATION));
 		Path filePath = Paths.get(getCaseContactImportTemplateFilePath());
 		try (CSVWriter writer = CSVUtils.createCSVWriter(new FileWriter(filePath.toString()), configFacade.getCsvSeparator())) {
 			writer.writeNext(columnNames.toArray(new String[columnNames.size()]));
@@ -194,8 +191,7 @@ public class ImportFacadeEjb implements ImportFacade {
 		columnNames.removeAll(Arrays.asList(ContactDto.CAZE, ContactDto.RESULTING_CASE));
 
 		Path filePath = Paths.get(getContactImportTemplateFilePath());
-		try (CSVWriter writer = CSVUtils.createCSVWriter(new FileWriter(filePath.toString()),
-				configFacade.getCsvSeparator())) {
+		try (CSVWriter writer = CSVUtils.createCSVWriter(new FileWriter(filePath.toString()), configFacade.getCsvSeparator())) {
 			writer.writeNext(columnNames.toArray(new String[columnNames.size()]));
 			writer.flush();
 		}
@@ -240,12 +236,12 @@ public class ImportFacadeEjb implements ImportFacade {
 	public void generatePointOfEntryImportTemplateFile() throws IOException {
 		generateImportTemplateFile(PointOfEntryDto.class, Paths.get(getPointOfEntryImportTemplateFilePath()));
 	}
-	
+
 	@Override
 	public void generatePopulationDataImportTemplateFile() throws IOException {
-		
+
 		createExportDirectoryIfNessecary();
-		
+
 		List<String> columnNames = new ArrayList<>();
 		columnNames.add(PopulationDataDto.REGION);
 		columnNames.add(PopulationDataDto.DISTRICT);
@@ -300,8 +296,7 @@ public class ImportFacadeEjb implements ImportFacade {
 		List<String> columnNames = new ArrayList<>();
 		List<String> entityNames = new ArrayList<>();
 		appendListOfFields(columnNames, entityNames, clazz, "");
-		try (CSVWriter writer = CSVUtils.createCSVWriter(new FileWriter(filePath.toString()),
-				configFacade.getCsvSeparator())) {
+		try (CSVWriter writer = CSVUtils.createCSVWriter(new FileWriter(filePath.toString()), configFacade.getCsvSeparator())) {
 			writer.writeNext(columnNames.toArray(new String[columnNames.size()]));
 			writer.flush();
 		}
@@ -313,7 +308,7 @@ public class ImportFacadeEjb implements ImportFacade {
 		Path filePath = exportDirectory.resolve(CASE_IMPORT_TEMPLATE_FILE_NAME);
 		return filePath.toString();
 	}
-	
+
 	@Override
 	public String getCaseContactImportTemplateFilePath() {
 		Path exportDirectory = Paths.get(configFacade.getGeneratedFilesPath());
@@ -334,7 +329,7 @@ public class ImportFacadeEjb implements ImportFacade {
 		Path filePath = exportDirectory.resolve(POINT_OF_ENTRY_IMPORT_TEMPLATE_FILE_NAME);
 		return filePath.toString();
 	}
-	
+
 	@Override
 	public String getPopulationDataImportTemplateFilePath() {
 		Path exportDirectory = Paths.get(configFacade.getGeneratedFilesPath());
@@ -403,7 +398,7 @@ public class ImportFacadeEjb implements ImportFacade {
 			// Fields without a getter or whose getters are declared in a superclass are ignored
 			if (readMethod == null || readMethod.getDeclaringClass() != clazz) {
 				continue;
-			}			
+			}
 			// Fields with the @ImportIgnore annotation are ignored
 			if (readMethod.isAnnotationPresent(ImportIgnore.class)) {
 				continue;
@@ -418,9 +413,17 @@ public class ImportFacadeEjb implements ImportFacade {
 			}
 			// Other non-infrastructure EntityDto/ReferenceDto classes, recursively call this method to include fields of the sub-entity
 			if (EntityDto.class.isAssignableFrom(field.getType()) && !isInfrastructureClass(field.getType())) {
-				appendListOfFields(columnNames, entityNames, field.getType(), prefix == null || prefix.isEmpty() ? field.getName() + "." :  prefix + field.getName() + ".");
+				appendListOfFields(
+					columnNames,
+					entityNames,
+					field.getType(),
+					prefix == null || prefix.isEmpty() ? field.getName() + "." : prefix + field.getName() + ".");
 			} else if (PersonReferenceDto.class.isAssignableFrom(field.getType()) && !isInfrastructureClass(field.getType())) {
-				appendListOfFields(columnNames, entityNames, PersonDto.class, prefix == null || prefix.isEmpty() ? field.getName() + "." : prefix + field.getName() + ".");
+				appendListOfFields(
+					columnNames,
+					entityNames,
+					PersonDto.class,
+					prefix == null || prefix.isEmpty() ? field.getName() + "." : prefix + field.getName() + ".");
 			} else {
 				entityNames.add(DataHelper.getHumanClassName(clazz));
 				columnNames.add(prefix + field.getName());
@@ -429,8 +432,11 @@ public class ImportFacadeEjb implements ImportFacade {
 	}
 
 	private boolean isInfrastructureClass(Class<?> clazz) {
-		return clazz == RegionReferenceDto.class || clazz == DistrictReferenceDto.class || clazz == CommunityReferenceDto.class 
-				|| clazz == FacilityReferenceDto.class || clazz == PointOfEntryReferenceDto.class;
+		return clazz == RegionReferenceDto.class
+			|| clazz == DistrictReferenceDto.class
+			|| clazz == CommunityReferenceDto.class
+			|| clazz == FacilityReferenceDto.class
+			|| clazz == PointOfEntryReferenceDto.class;
 	}
 
 	@LocalBean
