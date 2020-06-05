@@ -23,3 +23,6 @@ deploy
 /sormas-app/java_pid21052.hprof
 bin
 /sormas-base/setup/setup.log
+temp_auto_push.bat
+temp_interactive_push.bat
+.gitignore
